@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Activity, ActivityStatus, ActivityStatusLabels } from '../../../core/models/activity.model';
 
 @Component({
@@ -38,7 +39,17 @@ export class ActivityListComponent implements OnInit {
     { value: ActivityStatus.Cancelled,  label: 'Cancelada'   }
   ];
 
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly currentUser = this.auth.getCurrentUser();
+
   constructor(private activityService: ActivityService) {}
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigateByUrl('/login');
+  }
 
   ngOnInit(): void {
     this.load();
