@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'RAILWAY_URL_PLACEHOLDER/api'
+  apiUrl: 'https://jestr-activity-tracking-api.onrender.com/api'
 };
