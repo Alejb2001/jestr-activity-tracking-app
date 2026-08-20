@@ -1,5 +1,8 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
+# Archivos de contexto local — no subir a GitHub
+CONTEXT.md
+
 # Compiled output
 /dist
 /tmp
