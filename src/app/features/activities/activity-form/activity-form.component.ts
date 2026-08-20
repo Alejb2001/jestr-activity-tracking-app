@@ -6,7 +6,9 @@ import {
   Validators, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { ActivityService } from '../../../core/services/activity.service';
+import { UserService } from '../../../core/services/user.service';
 import { ActivityStatus } from '../../../core/models/activity.model';
+import { User } from '../../../core/models/user.model';
 
 function scheduledDateRangeValidator(group: AbstractControl): ValidationErrors | null {
   const start = group.get('scheduledStart')?.value;
@@ -30,6 +32,10 @@ export class ActivityFormComponent implements OnInit {
   submitting = false;
   error = '';
 
+  users: User[] = [];
+  usersLoading = false;
+  usersError = '';
+
   readonly statusOptions = [
     { value: ActivityStatus.Pending,    label: 'Pendiente'   },
     { value: ActivityStatus.InProgress, label: 'En Progreso' },
@@ -41,7 +47,8 @@ export class ActivityFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private activityService: ActivityService
+    private activityService: ActivityService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -50,9 +57,11 @@ export class ActivityFormComponent implements OnInit {
       description:    ['', [Validators.required, Validators.maxLength(500)]],
       scheduledStart: ['', Validators.required],
       scheduledEnd:   ['', Validators.required],
-      assignedUserId: ['', [Validators.required, Validators.maxLength(100)]],
+      assignedUserId: ['', Validators.required],
       status:         [ActivityStatus.Pending]
     }, { validators: scheduledDateRangeValidator });
+
+    this.loadUsers();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -60,6 +69,14 @@ export class ActivityFormComponent implements OnInit {
       this.activityId = +id;
       this.loadActivity(this.activityId);
     }
+  }
+
+  private loadUsers(): void {
+    this.usersLoading = true;
+    this.userService.getAll().subscribe({
+      next:  (data) => { this.users = data; this.usersLoading = false; },
+      error: ()     => { this.usersError = 'No se pudieron cargar los responsables.'; this.usersLoading = false; }
+    });
   }
 
   private loadActivity(id: number): void {

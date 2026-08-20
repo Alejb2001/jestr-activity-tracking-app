@@ -9,6 +9,7 @@
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading" novalidate>
 
+    <!-- Título -->
     <div class="mb-3">
       <label class="form-label fw-semibold">T&iacute;tulo <span class="text-danger">*</span></label>
       <input formControlName="title" type="text" class="form-control"
@@ -21,6 +22,7 @@
       </div>
     </div>
 
+    <!-- Descripción -->
     <div class="mb-3">
       <label class="form-label fw-semibold">Descripci&oacute;n <span class="text-danger">*</span></label>
       <textarea formControlName="description" rows="3" class="form-control"
@@ -32,6 +34,7 @@
       </div>
     </div>
 
+    <!-- Fechas -->
     <div class="row mb-1">
       <div class="col-6">
         <label class="form-label fw-semibold">Fecha de Inicio <span class="text-danger">*</span></label>
@@ -51,14 +54,28 @@
       La fecha de conclusi&oacute;n debe ser posterior a la de inicio.
     </div>
 
+    <!-- Responsable (dropdown) -->
     <div class="mb-3">
       <label class="form-label fw-semibold">Responsable <span class="text-danger">*</span></label>
-      <input formControlName="assignedUserId" type="text" class="form-control"
-             [class.is-invalid]="hasError('assignedUserId','required')"
-             placeholder="Usuario o miembro del equipo asignado">
+
+      <div *ngIf="usersLoading" class="d-flex align-items-center gap-2 text-muted small">
+        <div class="spinner-border spinner-border-sm"></div> Cargando responsables...
+      </div>
+
+      <div *ngIf="usersError" class="alert alert-warning py-1 small">{{ usersError }}</div>
+
+      <select *ngIf="!usersLoading && !usersError"
+              formControlName="assignedUserId" class="form-select"
+              [class.is-invalid]="hasError('assignedUserId','required')">
+        <option value="">-- Selecciona un responsable --</option>
+        <option *ngFor="let u of users" [value]="u.name">
+          {{ u.name }}<span *ngIf="u.department"> &mdash; {{ u.department }}</span>
+        </option>
+      </select>
       <div class="invalid-feedback">El responsable es requerido.</div>
     </div>
 
+    <!-- Estado (solo edición) -->
     <div class="mb-3" *ngIf="isEditMode">
       <label class="form-label fw-semibold">Estado de Progreso</label>
       <select formControlName="status" class="form-select">
@@ -66,6 +83,7 @@
       </select>
     </div>
 
+    <!-- Acciones -->
     <div class="d-flex gap-2 mt-4">
       <button type="submit" class="btn btn-primary" [disabled]="submitting">
         {{ submitting ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear Actividad') }}
