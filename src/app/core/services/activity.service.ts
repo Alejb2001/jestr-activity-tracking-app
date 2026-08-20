@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Activity, CreateActivityPayload, UpdateActivityPayload } from '../models/activity.model';
+import {
+  Activity, ActivityQueryParams, CreateActivityPayload,
+  PagedResult, UpdateActivityPayload
+} from '../models/activity.model';
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
@@ -10,8 +13,15 @@ export class ActivityService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Activity[]> {
-    return this.http.get<Activity[]>(this.baseUrl);
+  getAll(params: ActivityQueryParams = {}): Observable<PagedResult<Activity>> {
+    let httpParams = new HttpParams();
+    if (params.status != null)       httpParams = httpParams.set('status', params.status.toString());
+    if (params.assignedUserId)       httpParams = httpParams.set('assignedUserId', params.assignedUserId);
+    if (params.startDate)            httpParams = httpParams.set('startDate', params.startDate);
+    if (params.endDate)              httpParams = httpParams.set('endDate', params.endDate);
+    if (params.page != null)         httpParams = httpParams.set('page', params.page.toString());
+    if (params.pageSize != null)     httpParams = httpParams.set('pageSize', params.pageSize.toString());
+    return this.http.get<PagedResult<Activity>>(this.baseUrl, { params: httpParams });
   }
 
   getById(id: number): Observable<Activity> {

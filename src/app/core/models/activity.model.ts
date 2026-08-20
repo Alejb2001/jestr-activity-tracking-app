@@ -36,3 +36,20 @@ export interface CreateActivityPayload {
 export interface UpdateActivityPayload extends CreateActivityPayload {
   status: ActivityStatus;
 }
+
+export interface ActivityQueryParams {
+  status?: ActivityStatus | null;
+  assignedUserId?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
