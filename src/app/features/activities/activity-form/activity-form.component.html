@@ -1,0 +1,77 @@
+<div class="container mt-4" style="max-width:680px">
+  <h2>{{ isEditMode ? 'Editar Actividad' : 'Nueva Actividad' }}</h2>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loading" novalidate>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold">T&iacute;tulo <span class="text-danger">*</span></label>
+      <input formControlName="title" type="text" class="form-control"
+             [class.is-invalid]="hasError('title','required') || hasError('title','minlength') || hasError('title','maxlength')"
+             placeholder="Nombre de la actividad">
+      <div class="invalid-feedback">
+        <span *ngIf="hasError('title','required')">El t&iacute;tulo es requerido.</span>
+        <span *ngIf="hasError('title','minlength')">M&iacute;nimo 3 caracteres.</span>
+        <span *ngIf="hasError('title','maxlength')">M&aacute;ximo 100 caracteres.</span>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Descripci&oacute;n <span class="text-danger">*</span></label>
+      <textarea formControlName="description" rows="3" class="form-control"
+                [class.is-invalid]="hasError('description','required') || hasError('description','maxlength')"
+                placeholder="Detalle de la actividad"></textarea>
+      <div class="invalid-feedback">
+        <span *ngIf="hasError('description','required')">La descripci&oacute;n es requerida.</span>
+        <span *ngIf="hasError('description','maxlength')">M&aacute;ximo 500 caracteres.</span>
+      </div>
+    </div>
+
+    <div class="row mb-1">
+      <div class="col-6">
+        <label class="form-label fw-semibold">Fecha de Inicio <span class="text-danger">*</span></label>
+        <input formControlName="scheduledStart" type="date" class="form-control"
+               [class.is-invalid]="hasError('scheduledStart','required')">
+        <div class="invalid-feedback">Requerida.</div>
+      </div>
+      <div class="col-6">
+        <label class="form-label fw-semibold">Fecha de Conclusi&oacute;n <span class="text-danger">*</span></label>
+        <input formControlName="scheduledEnd" type="date" class="form-control"
+               [class.is-invalid]="hasError('scheduledEnd','required')">
+        <div class="invalid-feedback">Requerida.</div>
+      </div>
+    </div>
+    <div class="alert alert-warning py-1 small mb-3"
+         *ngIf="form.hasError('dateRange') && form.touched">
+      La fecha de conclusi&oacute;n debe ser posterior a la de inicio.
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Responsable <span class="text-danger">*</span></label>
+      <input formControlName="assignedUserId" type="text" class="form-control"
+             [class.is-invalid]="hasError('assignedUserId','required')"
+             placeholder="Usuario o miembro del equipo asignado">
+      <div class="invalid-feedback">El responsable es requerido.</div>
+    </div>
+
+    <div class="mb-3" *ngIf="isEditMode">
+      <label class="form-label fw-semibold">Estado de Progreso</label>
+      <select formControlName="status" class="form-select">
+        <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn btn-primary" [disabled]="submitting">
+        {{ submitting ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Crear Actividad') }}
+      </button>
+      <a routerLink="/activities" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+
+  </form>
+</div>
