@@ -1,7 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { CompanyService } from '../../../core/services/company.service';
 import { NotificationService } from '../../../core/services/notification.service';
 
 const GLOBAL_USERNAMES = ['admin', 'viewer'];
@@ -17,22 +19,30 @@ function companyCodeValidator(group: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
+  private readonly companyService = inject(CompanyService);
 
   loading = false;
+  companies: { name: string; code: string }[] = [];
 
   form = this.fb.group({
     companyCode: [''],
     username: ['', Validators.required],
     password: ['', Validators.required]
   }, { validators: companyCodeValidator });
+
+  ngOnInit(): void {
+    this.companyService.getPublicList().subscribe({
+      next: (list) => { this.companies = list; }
+    });
+  }
 
   get isGlobalUser(): boolean {
     const username = (this.form.get('username')?.value ?? '').toLowerCase().trim();

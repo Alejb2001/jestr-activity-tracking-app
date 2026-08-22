@@ -13,6 +13,10 @@ export class CompanyService {
 
   constructor(private http: HttpClient) {}
 
+  getPublicList(): Observable<{ name: string; code: string }[]> {
+    return this.http.get<{ name: string; code: string }[]>(`${this.baseUrl}/public`);
+  }
+
   getAll(): Observable<Company[]> {
     return this.http.get<Company[]>(this.baseUrl);
   }

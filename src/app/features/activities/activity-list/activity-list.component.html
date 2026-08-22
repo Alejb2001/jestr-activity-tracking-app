@@ -27,7 +27,7 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Actividades del Equipo</h2>
     @if (!isViewer) {
-      <a routerLink="/activities/new" class="btn btn-primary">+ Nueva Actividad</a>
+      <button class="btn btn-primary" (click)="openModal()">+ Nueva Actividad</button>
     }
   </div>
 
@@ -153,3 +153,101 @@
   </div>
 
 </div>
+
+<!-- ── Modal: Nueva Actividad ──────────────────────────────────────────────── -->
+
+@if (showModal) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1" (click)="closeModal()">
+    <div class="modal-dialog modal-lg modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Nueva Actividad</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div *ngIf="modalError" class="alert alert-danger py-2">{{ modalError }}</div>
+
+          <form [formGroup]="createForm" (ngSubmit)="submitModal()" novalidate>
+
+            <!-- Título -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">T&iacute;tulo <span class="text-danger">*</span></label>
+              <input formControlName="title" type="text" class="form-control"
+                     [class.is-invalid]="hasModalError('title','required') || hasModalError('title','minlength') || hasModalError('title','maxlength')"
+                     placeholder="Nombre de la actividad">
+              <div class="invalid-feedback">
+                <span *ngIf="hasModalError('title','required')">El t&iacute;tulo es requerido.</span>
+                <span *ngIf="hasModalError('title','minlength')">M&iacute;nimo 3 caracteres.</span>
+                <span *ngIf="hasModalError('title','maxlength')">M&aacute;ximo 100 caracteres.</span>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Descripci&oacute;n <span class="text-danger">*</span></label>
+              <textarea formControlName="description" rows="3" class="form-control"
+                        [class.is-invalid]="hasModalError('description','required') || hasModalError('description','maxlength')"
+                        placeholder="Detalle de la actividad"></textarea>
+              <div class="invalid-feedback">
+                <span *ngIf="hasModalError('description','required')">La descripci&oacute;n es requerida.</span>
+                <span *ngIf="hasModalError('description','maxlength')">M&aacute;ximo 500 caracteres.</span>
+              </div>
+            </div>
+
+            <!-- Fechas -->
+            <div class="row mb-1">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Fecha de Inicio <span class="text-danger">*</span></label>
+                <input formControlName="scheduledStart" type="date" class="form-control"
+                       [class.is-invalid]="hasModalError('scheduledStart','required')">
+                <div class="invalid-feedback">Requerida.</div>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Fecha de Conclusi&oacute;n <span class="text-danger">*</span></label>
+                <input formControlName="scheduledEnd" type="date" class="form-control"
+                       [class.is-invalid]="hasModalError('scheduledEnd','required')">
+                <div class="invalid-feedback">Requerida.</div>
+              </div>
+            </div>
+            <div class="alert alert-warning py-1 small mb-3"
+                 *ngIf="createForm.hasError('dateRange') && createForm.touched">
+              La fecha de conclusi&oacute;n debe ser posterior a la de inicio.
+            </div>
+
+            <!-- Responsable -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Responsable <span class="text-danger">*</span></label>
+
+              <div *ngIf="modalUsersLoading" class="d-flex align-items-center gap-2 text-muted small">
+                <div class="spinner-border spinner-border-sm"></div> Cargando responsables...
+              </div>
+
+              <select *ngIf="!modalUsersLoading"
+                      formControlName="assignedUserId" class="form-select"
+                      [class.is-invalid]="hasModalError('assignedUserId','required')">
+                <option value="">-- Selecciona un responsable --</option>
+                <option *ngFor="let u of modalUsers" [value]="u.name">
+                  {{ u.name }}@if (u.department) { &mdash; {{ u.department }}}
+                </option>
+              </select>
+              <div class="invalid-feedback">El responsable es requerido.</div>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" (click)="submitModal()" [disabled]="modalSubmitting">
+            {{ modalSubmitting ? 'Guardando...' : 'Crear Actividad' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

@@ -15,17 +15,19 @@
               <span class="text-danger">*</span>
             }
           </label>
-          <input
+          <select
             id="companyCode"
-            type="text"
-            class="form-control"
+            class="form-select"
             [class.is-invalid]="showCompanyError"
             formControlName="companyCode"
-            placeholder="C&oacute;digo de empresa"
-            autocomplete="organization"
-          />
+          >
+            <option value="">— Selecciona una empresa —</option>
+            @for (c of companies; track c.code) {
+              <option [value]="c.code">{{ c.name }}</option>
+            }
+          </select>
           @if (showCompanyError) {
-            <div class="invalid-feedback d-block">El c&oacute;digo de empresa es requerido.</div>
+            <div class="invalid-feedback d-block">Debes seleccionar una empresa.</div>
           }
         </div>
 
