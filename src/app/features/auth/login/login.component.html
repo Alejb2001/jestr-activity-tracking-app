@@ -9,9 +9,7 @@
         <div class="mb-3">
           <label for="companyCode" class="form-label">
             Empresa
-            @if (isGlobalUser) {
-              <span class="text-muted small">(opcional)</span>
-            } @else {
+            @if (!isGlobalUser) {
               <span class="text-danger">*</span>
             }
           </label>
