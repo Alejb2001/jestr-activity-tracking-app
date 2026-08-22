@@ -6,6 +6,7 @@ import { AuthResponse, LoginPayload } from '../models/auth.model';
 
 export interface StoredUser {
   username: string;
+  name?: string;
   role: string;
   companyId?: number;
   companyName?: string;
@@ -23,6 +24,7 @@ export class AuthService {
         localStorage.setItem(this.tokenKey, response.token);
         localStorage.setItem(this.userKey, JSON.stringify({
           username: response.username,
+          name: response.name,
           role: response.role,
           companyId: response.companyId,
           companyName: response.companyName

@@ -44,11 +44,13 @@
           </select>
         </div>
 
-        <div class="col-md-3">
-          <label class="form-label small fw-semibold">Responsable</label>
-          <input type="text" class="form-control form-control-sm" [(ngModel)]="filterUser"
-                 placeholder="ID o nombre">
-        </div>
+        @if (hasCompanyModuleAccess) {
+          <div class="col-md-3">
+            <label class="form-label small fw-semibold">Responsable</label>
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="filterUser"
+                   placeholder="ID o nombre">
+          </div>
+        }
 
         <div class="col-md-2">
           <label class="form-label small fw-semibold">Inicio desde</label>
@@ -107,9 +109,11 @@
             <td>{{ a.scheduledEnd   | date:'dd/MM/yyyy' }}</td>
             <td><span [class]="priorityClass(a.priority)">{{ priorityLabels[a.priority] }}</span></td>
             <td>
-              @if (!isViewer) {
-                <div class="d-flex flex-wrap align-items-center gap-1">
-                  <span [class]="statusClass(a.status)">{{ statusLabels[a.status] }}</span>
+              <span [class]="statusClass(a.status)">{{ statusLabels[a.status] }}</span>
+            </td>
+            @if (!isViewer) {
+              <td class="text-end">
+                <div class="d-flex justify-content-end align-items-center gap-1 flex-wrap">
                   @if (a.status === ActivityStatus.Pending) {
                     <button class="btn btn-sm btn-success" (click)="patchStatus(a.id, ActivityStatus.InProgress)">Iniciar</button>
                   }
@@ -117,16 +121,11 @@
                     <button class="btn btn-sm btn-warning" (click)="patchStatus(a.id, ActivityStatus.Pending)">Detener</button>
                     <button class="btn btn-sm btn-primary" (click)="patchStatus(a.id, ActivityStatus.Completed)">Terminar</button>
                   }
+                  @if (hasCompanyModuleAccess) {
+                    <a [routerLink]="['/activities', a.id, 'edit']" class="btn btn-sm btn-outline-secondary">Editar</a>
+                  }
+                  <button class="btn btn-sm btn-outline-danger" (click)="delete(a.id)">Eliminar</button>
                 </div>
-              } @else {
-                <span [class]="statusClass(a.status)">{{ statusLabels[a.status] }}</span>
-              }
-            </td>
-            @if (!isViewer) {
-              <td class="text-end">
-                <a [routerLink]="['/activities', a.id, 'edit']"
-                   class="btn btn-sm btn-outline-secondary me-1">Editar</a>
-                <button class="btn btn-sm btn-outline-danger" (click)="delete(a.id)">Eliminar</button>
               </td>
             }
           </tr>

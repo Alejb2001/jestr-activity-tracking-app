@@ -112,9 +112,12 @@ export class ActivityListComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.error = '';
+    const assignedFilter = this.hasCompanyModuleAccess
+      ? (this.filterUser || undefined)
+      : (this.currentUser?.name ?? undefined);
     this.activityService.getAll({
       status:         this.filterStatus !== '' ? this.filterStatus : null,
-      assignedUserId: this.filterUser   || undefined,
+      assignedUserId: assignedFilter,
       startDate:      this.filterStart  || undefined,
       endDate:        this.filterEnd    || undefined,
       page:           this.page,
@@ -199,8 +202,13 @@ export class ActivityListComponent implements OnInit {
   patchStatus(id: number, status: ActivityStatus): void {
     this.activityService.patchStatus(id, status).subscribe({
       next: (updated) => {
-        const idx = this.activities.findIndex(a => a.id === id);
-        if (idx !== -1) this.activities[idx] = updated;
+        if (status === ActivityStatus.Completed) {
+          this.activities = this.activities.filter(a => a.id !== id);
+          this.totalCount = Math.max(0, this.totalCount - 1);
+        } else {
+          const idx = this.activities.findIndex(a => a.id === id);
+          if (idx !== -1) this.activities[idx] = updated;
+        }
       },
       error: () => { this.error = 'Error al actualizar el estado.'; }
     });

@@ -7,6 +7,7 @@ export interface LoginPayload {
 export interface AuthResponse {
   token: string;
   username: string;
+  name?: string;
   role: string;
   companyId?: number;
   companyName?: string;
