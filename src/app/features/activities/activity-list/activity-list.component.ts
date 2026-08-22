@@ -44,6 +44,21 @@ export class ActivityListComponent implements OnInit {
 
   readonly currentUser = this.auth.getCurrentUser();
 
+  get isViewer(): boolean {
+    return this.auth.isViewer();
+  }
+
+  get hasCompanyModuleAccess(): boolean {
+    return this.auth.hasCompanyModuleAccess();
+  }
+
+  get companiesLink(): string[] {
+    if (this.auth.isCompanyAdmin() && this.currentUser?.companyId) {
+      return ['/companies', this.currentUser.companyId.toString()];
+    }
+    return ['/companies'];
+  }
+
   constructor(private activityService: ActivityService) {}
 
   logout(): void {

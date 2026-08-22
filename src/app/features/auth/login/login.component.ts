@@ -1,8 +1,19 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+
+const GLOBAL_USERNAMES = ['admin', 'viewer'];
+
+function companyCodeValidator(group: AbstractControl): ValidationErrors | null {
+  const username = (group.get('username')?.value ?? '').toLowerCase().trim();
+  const companyCode = (group.get('companyCode')?.value ?? '').trim();
+  if (!GLOBAL_USERNAMES.includes(username) && !companyCode) {
+    return { companyCodeRequired: true };
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-login',
@@ -18,17 +29,32 @@ export class LoginComponent {
   loading = false;
 
   form = this.fb.group({
+    companyCode: [''],
     username: ['', Validators.required],
     password: ['', Validators.required]
-  });
+  }, { validators: companyCodeValidator });
+
+  get isGlobalUser(): boolean {
+    const username = (this.form.get('username')?.value ?? '').toLowerCase().trim();
+    return GLOBAL_USERNAMES.includes(username);
+  }
+
+  get showCompanyError(): boolean {
+    return !!this.form.hasError('companyCodeRequired') && this.form.touched;
+  }
 
   onSubmit(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     this.loading = true;
-    const { username, password } = this.form.value;
+    const { companyCode, username, password } = this.form.value;
 
-    this.auth.login({ username: username!, password: password! }).subscribe({
+    this.auth.login({
+      username: username!,
+      password: password!,
+      companyCode: companyCode?.trim() || undefined
+    }).subscribe({
       next: () => {
         this.router.navigateByUrl('/activities');
       },

@@ -1,0 +1,122 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+  <div class="container">
+    <span class="navbar-brand fw-bold">Activity Tracker</span>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      @if (currentUser) {
+        <span class="text-white small">
+          Hola, <strong>{{ currentUser.username }}</strong>
+          <span class="badge bg-warning text-dark ms-2">Acceso Global</span>
+        </span>
+      }
+      <a routerLink="/activities" class="btn btn-outline-light btn-sm">Actividades</a>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">Cerrar sesi&oacute;n</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-0">Administraci&oacute;n de Empresas</h2>
+      <p class="text-muted small mb-0 mt-1">Gestiona las empresas clientes registradas en el sistema.</p>
+    </div>
+    <button class="btn btn-primary" (click)="showForm = !showForm">
+      {{ showForm ? 'Cancelar' : '+ Nueva Empresa' }}
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- Formulario nueva empresa -->
+  <div *ngIf="showForm" class="card mb-4">
+    <div class="card-header fw-semibold">Nueva Empresa</div>
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="createCompany()" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input formControlName="name" type="text" class="form-control"
+                   [class.is-invalid]="hasError('name','required') || hasError('name','minlength') || hasError('name','maxlength')"
+                   placeholder="Nombre de la empresa">
+            <div class="invalid-feedback">
+              <span *ngIf="hasError('name','required')">El nombre es requerido.</span>
+              <span *ngIf="hasError('name','minlength')">M&iacute;nimo 2 caracteres.</span>
+              <span *ngIf="hasError('name','maxlength')">M&aacute;ximo 100 caracteres.</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">C&oacute;digo <span class="text-danger">*</span></label>
+            <input formControlName="code" type="text" class="form-control"
+                   [class.is-invalid]="hasError('code','required') || hasError('code','minlength') || hasError('code','maxlength')"
+                   placeholder="Ej: ACME">
+            <div class="invalid-feedback">
+              <span *ngIf="hasError('code','required')">El c&oacute;digo es requerido.</span>
+              <span *ngIf="hasError('code','minlength')">M&iacute;nimo 2 caracteres.</span>
+              <span *ngIf="hasError('code','maxlength')">M&aacute;ximo 20 caracteres.</span>
+            </div>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100" [disabled]="submitting">
+              {{ submitting ? 'Guardando...' : 'Crear' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <!-- Sin resultados -->
+  <div *ngIf="!loading && companies.length === 0 && !error" class="alert alert-info">
+    No hay empresas registradas. Crea la primera empresa con el bot&oacute;n superior.
+  </div>
+
+  <!-- Tabla -->
+  <div *ngIf="!loading && companies.length > 0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>Nombre</th>
+            <th>C&oacute;digo</th>
+            <th>Estado</th>
+            <th>Registrada</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of companies">
+            <td class="fw-semibold">{{ c.name }}</td>
+            <td><span class="badge bg-secondary">{{ c.code }}</span></td>
+            <td>
+              <span [class]="c.isActive ? 'badge bg-success' : 'badge bg-danger'">
+                {{ c.isActive ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+            <td class="text-muted small">{{ c.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td class="text-end">
+              <a [routerLink]="['/companies', c.id]" class="btn btn-sm btn-outline-secondary me-1">
+                Gestionar
+              </a>
+              <button *ngIf="c.isActive"
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="deactivate(c.id, c.name)">
+                Desactivar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <small class="text-muted">{{ companies.length }} empresa{{ companies.length !== 1 ? 's' : '' }} registrada{{ companies.length !== 1 ? 's' : '' }}</small>
+  </div>
+
+</div>
