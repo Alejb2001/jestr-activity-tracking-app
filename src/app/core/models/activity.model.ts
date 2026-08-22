@@ -12,6 +12,18 @@ export const ActivityStatusLabels: Record<ActivityStatus, string> = {
   [ActivityStatus.Cancelled]:  'Cancelada'
 };
 
+export enum ActivityPriority {
+  Low    = 0,
+  Medium = 1,
+  High   = 2
+}
+
+export const ActivityPriorityLabels: Record<ActivityPriority, string> = {
+  [ActivityPriority.Low]:    'Baja',
+  [ActivityPriority.Medium]: 'Media',
+  [ActivityPriority.High]:   'Alta'
+};
+
 export interface Activity {
   id: number;
   title: string;
@@ -20,6 +32,7 @@ export interface Activity {
   scheduledEnd: string;
   status: ActivityStatus;
   statusLabel: string;
+  priority: ActivityPriority;
   assignedUserId: string;
   createdAt: string;
   updatedAt?: string;
@@ -31,10 +44,12 @@ export interface CreateActivityPayload {
   scheduledStart: string;
   scheduledEnd: string;
   assignedUserId: string;
+  priority?: ActivityPriority;
 }
 
 export interface UpdateActivityPayload extends CreateActivityPayload {
   status: ActivityStatus;
+  priority: ActivityPriority;
 }
 
 export interface ActivityQueryParams {

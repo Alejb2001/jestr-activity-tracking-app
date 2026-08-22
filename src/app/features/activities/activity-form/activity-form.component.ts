@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 import { ActivityService } from '../../../core/services/activity.service';
 import { UserService } from '../../../core/services/user.service';
-import { ActivityStatus } from '../../../core/models/activity.model';
+import { ActivityPriority, ActivityStatus } from '../../../core/models/activity.model';
 import { User } from '../../../core/models/user.model';
 
 function scheduledDateRangeValidator(group: AbstractControl): ValidationErrors | null {
@@ -58,7 +58,8 @@ export class ActivityFormComponent implements OnInit {
       scheduledStart: ['', Validators.required],
       scheduledEnd:   ['', Validators.required],
       assignedUserId: ['', Validators.required],
-      status:         [ActivityStatus.Pending]
+      status:         [ActivityStatus.Pending],
+      priority:       [ActivityPriority.Medium]
     }, { validators: scheduledDateRangeValidator });
 
     this.loadUsers();
@@ -89,7 +90,8 @@ export class ActivityFormComponent implements OnInit {
           scheduledStart: a.scheduledStart.substring(0, 10),
           scheduledEnd:   a.scheduledEnd.substring(0, 10),
           assignedUserId: a.assignedUserId,
-          status:         a.status
+          status:         a.status,
+          priority:       a.priority
         });
         this.loading = false;
       },
@@ -107,18 +109,18 @@ export class ActivityFormComponent implements OnInit {
     this.submitting = true;
     this.error = '';
 
-    const { title, description, scheduledStart, scheduledEnd, assignedUserId, status } = this.form.value;
+    const { title, description, scheduledStart, scheduledEnd, assignedUserId, status, priority } = this.form.value;
 
     if (this.isEditMode && this.activityId) {
       this.activityService.update(this.activityId,
-        { title, description, scheduledStart, scheduledEnd, assignedUserId, status }
+        { title, description, scheduledStart, scheduledEnd, assignedUserId, status, priority }
       ).subscribe({
         next:  () => this.router.navigate(['/activities']),
         error: () => { this.error = 'Error al actualizar.'; this.submitting = false; }
       });
     } else {
       this.activityService.create(
-        { title, description, scheduledStart, scheduledEnd, assignedUserId }
+        { title, description, scheduledStart, scheduledEnd, assignedUserId, priority }
       ).subscribe({
         next:  () => this.router.navigate(['/activities']),
         error: () => { this.error = 'Error al crear la actividad.'; this.submitting = false; }

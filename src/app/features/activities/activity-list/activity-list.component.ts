@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Activity, ActivityStatus, ActivityStatusLabels } from '../../../core/models/activity.model';
+import { Activity, ActivityPriority, ActivityPriorityLabels, ActivityStatus, ActivityStatusLabels } from '../../../core/models/activity.model';
 import { User } from '../../../core/models/user.model';
 
 function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
@@ -37,14 +37,22 @@ export class ActivityListComponent implements OnInit {
   filterStart = '';
   filterEnd = '';
 
-  readonly statusLabels = ActivityStatusLabels;
-  readonly ActivityStatus = ActivityStatus;
+  readonly statusLabels   = ActivityStatusLabels;
+  readonly priorityLabels = ActivityPriorityLabels;
+  readonly ActivityStatus   = ActivityStatus;
+  readonly ActivityPriority = ActivityPriority;
 
   readonly statusOptions = [
     { value: ActivityStatus.Pending,    label: 'Pendiente'   },
     { value: ActivityStatus.InProgress, label: 'En Progreso' },
     { value: ActivityStatus.Completed,  label: 'Completada'  },
     { value: ActivityStatus.Cancelled,  label: 'Cancelada'   }
+  ];
+
+  readonly priorityOptions = [
+    { value: ActivityPriority.Low,    label: 'Baja'  },
+    { value: ActivityPriority.Medium, label: 'Media' },
+    { value: ActivityPriority.High,   label: 'Alta'  }
   ];
 
   // Modal de creación
@@ -66,7 +74,8 @@ export class ActivityListComponent implements OnInit {
     description:    ['', [Validators.required, Validators.maxLength(500)]],
     scheduledStart: ['', Validators.required],
     scheduledEnd:   ['', Validators.required],
-    assignedUserId: ['', Validators.required]
+    assignedUserId: ['', Validators.required],
+    priority:       [ActivityPriority.Medium, Validators.required]
   }, { validators: dateRangeValidator });
 
   get isViewer(): boolean {
@@ -173,8 +182,8 @@ export class ActivityListComponent implements OnInit {
     if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
     this.modalSubmitting = true;
     this.modalError = '';
-    const { title, description, scheduledStart, scheduledEnd, assignedUserId } = this.createForm.value;
-    this.activityService.create({ title: title!, description: description!, scheduledStart: scheduledStart!, scheduledEnd: scheduledEnd!, assignedUserId: assignedUserId! }).subscribe({
+    const { title, description, scheduledStart, scheduledEnd, assignedUserId, priority } = this.createForm.value;
+    this.activityService.create({ title: title!, description: description!, scheduledStart: scheduledStart!, scheduledEnd: scheduledEnd!, assignedUserId: assignedUserId!, priority: priority! }).subscribe({
       next: () => {
         this.showModal = false;
         this.modalSubmitting = false;
@@ -184,6 +193,16 @@ export class ActivityListComponent implements OnInit {
         this.modalError = 'Error al crear la actividad.';
         this.modalSubmitting = false;
       }
+    });
+  }
+
+  patchStatus(id: number, status: ActivityStatus): void {
+    this.activityService.patchStatus(id, status).subscribe({
+      next: (updated) => {
+        const idx = this.activities.findIndex(a => a.id === id);
+        if (idx !== -1) this.activities[idx] = updated;
+      },
+      error: () => { this.error = 'Error al actualizar el estado.'; }
     });
   }
 
@@ -197,6 +216,15 @@ export class ActivityListComponent implements OnInit {
       [ActivityStatus.Cancelled]:  'badge bg-danger'
     };
     return map[status];
+  }
+
+  priorityClass(priority: ActivityPriority): string {
+    const map: Record<ActivityPriority, string> = {
+      [ActivityPriority.Low]:    'badge bg-info text-dark',
+      [ActivityPriority.Medium]: 'badge bg-warning text-dark',
+      [ActivityPriority.High]:   'badge bg-danger'
+    };
+    return map[priority];
   }
 
   get pageNumbers(): number[] {

@@ -92,6 +92,7 @@
             <th>Responsable</th>
             <th>Inicio</th>
             <th>Conclusi&oacute;n</th>
+            <th>Prioridad</th>
             <th>Estado</th>
             @if (!isViewer) {
               <th class="text-end">Acciones</th>
@@ -104,7 +105,19 @@
             <td>{{ a.assignedUserId }}</td>
             <td>{{ a.scheduledStart | date:'dd/MM/yyyy' }}</td>
             <td>{{ a.scheduledEnd   | date:'dd/MM/yyyy' }}</td>
-            <td><span [class]="statusClass(a.status)">{{ statusLabels[a.status] }}</span></td>
+            <td><span [class]="priorityClass(a.priority)">{{ priorityLabels[a.priority] }}</span></td>
+            <td>
+              @if (!isViewer) {
+                <select class="form-select form-select-sm" style="min-width:130px"
+                        (change)="patchStatus(a.id, +$any($event.target).value)">
+                  <option *ngFor="let opt of statusOptions" [value]="opt.value" [selected]="a.status === opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              } @else {
+                <span [class]="statusClass(a.status)">{{ statusLabels[a.status] }}</span>
+              }
+            </td>
             @if (!isViewer) {
               <td class="text-end">
                 <a [routerLink]="['/activities', a.id, 'edit']"
@@ -216,6 +229,14 @@
             <div class="alert alert-warning py-1 small mb-3"
                  *ngIf="createForm.hasError('dateRange') && createForm.touched">
               La fecha de conclusi&oacute;n debe ser posterior a la de inicio.
+            </div>
+
+            <!-- Prioridad -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Prioridad</label>
+              <select formControlName="priority" class="form-select">
+                <option *ngFor="let opt of priorityOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
             </div>
 
             <!-- Responsable -->

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
-  Activity, ActivityQueryParams, CreateActivityPayload,
+  Activity, ActivityQueryParams, ActivityStatus, CreateActivityPayload,
   PagedResult, UpdateActivityPayload
 } from '../models/activity.model';
 
@@ -34,6 +34,10 @@ export class ActivityService {
 
   update(id: number, payload: UpdateActivityPayload): Observable<Activity> {
     return this.http.put<Activity>(`${this.baseUrl}/${id}`, payload);
+  }
+
+  patchStatus(id: number, status: ActivityStatus): Observable<Activity> {
+    return this.http.patch<Activity>(`${this.baseUrl}/${id}/status`, { status });
   }
 
   delete(id: number): Observable<void> {
