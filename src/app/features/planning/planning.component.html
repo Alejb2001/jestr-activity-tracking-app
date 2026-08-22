@@ -1,0 +1,339 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+  <div class="container">
+    <span class="navbar-brand fw-bold">Activity Tracker</span>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      @if (currentUser) {
+        <span class="text-white small">
+          Hola, <strong>{{ currentUser.username }}</strong>
+          @if (currentUser.companyName) {
+            <span class="badge bg-light text-primary ms-2">{{ currentUser.companyName }}</span>
+          } @else {
+            <span class="badge bg-warning text-dark ms-2">Acceso Global</span>
+          }
+        </span>
+      }
+      <a routerLink="/activities" class="btn btn-outline-light btn-sm">Actividades</a>
+      @if (hasCompanyAccess) {
+        <a [routerLink]="companiesLink" class="btn btn-outline-light btn-sm">Empresas</a>
+      }
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">Cerrar sesi&oacute;n</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Planificaci&oacute;n</h2>
+    @if (!isViewer) {
+      <button class="btn btn-primary" (click)="openCreate()">+ Nueva Actividad</button>
+    }
+  </div>
+
+  <!-- Timeline controls -->
+  <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+    <button class="btn btn-outline-secondary btn-sm" (click)="shiftView(-14)">&laquo; 2 semanas</button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="shiftView(-7)">&lsaquo; Semana</button>
+    <button class="btn btn-outline-primary btn-sm" (click)="goToday()">Hoy</button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="shiftView(7)">Semana &rsaquo;</button>
+    <button class="btn btn-outline-secondary btn-sm" (click)="shiftView(14)">2 semanas &raquo;</button>
+    <span class="text-muted small ms-2">
+      {{ viewStart | date:'d MMM yyyy' }}
+      &mdash;
+      vista de {{ viewDays }} d&iacute;as
+    </span>
+  </div>
+
+  <!-- Leyenda -->
+  <div class="d-flex gap-4 mb-3 small align-items-center flex-wrap">
+    <span class="d-flex align-items-center gap-1">
+      <span class="d-inline-block rounded" style="width:18px;height:10px;background:#0dcaf0"></span> Prioridad baja
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <span class="d-inline-block rounded" style="width:18px;height:10px;background:#fd7e14"></span> Prioridad media
+    </span>
+    <span class="d-flex align-items-center gap-1">
+      <span class="d-inline-block rounded" style="width:18px;height:10px;background:#dc3545"></span> Prioridad alta
+    </span>
+    <span class="text-muted">Opacidad reducida&nbsp;= Pendiente &bull; Borde blanco&nbsp;= En Progreso</span>
+    @if (!isViewer) {
+      <span class="text-muted">Haz clic en una fila para editar / asignar</span>
+    }
+  </div>
+
+  <!-- Spinner -->
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  <!-- Gantt -->
+  @if (!loading && !error) {
+    @if (activities.length === 0) {
+      <div class="alert alert-info">No hay actividades activas. Crea una con el bot&oacute;n superior.</div>
+    } @else {
+      <div class="gantt-wrap">
+
+        <!-- ── Header row ──────────────────────────────────────────────── -->
+        <div class="gantt-head">
+          <div class="gantt-label-th">Actividad</div>
+          <div class="gantt-days-th">
+            @for (d of headerDates; track d.getTime(); let i = $index) {
+              <div class="gantt-day-th"
+                   [class.weekend]="isWeekend(d)"
+                   [class.is-today]="isToday(d)"
+                   [style.width.px]="dayW">
+                @if (showMonth(i, d)) {
+                  <span class="gantt-month">{{ d | date:'MMM' }}</span>
+                }
+                <span>{{ d | date:'d' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ── Activity rows ───────────────────────────────────────────── -->
+        @for (a of activities; track a.id) {
+          <div class="gantt-row">
+
+            <!-- Label (sticky left) -->
+            <div class="gantt-label-td" (click)="openEdit(a)" [style.min-height.px]="rowH"
+                 [title]="isViewer ? '' : 'Haz clic para editar'">
+              <div class="fw-semibold text-truncate" style="font-size:13px;max-width:236px">
+                {{ a.title }}
+              </div>
+              <div class="d-flex gap-1 mt-1 flex-wrap">
+                <span [class]="statusCls(a.status)"   style="font-size:10px">{{ statusLabels[a.status] }}</span>
+                <span [class]="priorityCls(a.priority)" style="font-size:10px">{{ priorityLabels[a.priority] }}</span>
+              </div>
+              <small class="text-muted text-truncate d-block" style="font-size:11px;max-width:236px">
+                {{ a.assignedUserId || 'Sin asignar' }}
+              </small>
+            </div>
+
+            <!-- Timeline cell -->
+            <div class="gantt-cell" [style.min-width.px]="totalWidth" [style.min-height.px]="rowH">
+
+              <!-- Day column backgrounds -->
+              @for (d of headerDates; track d.getTime(); let i = $index) {
+                <div class="gantt-col-bg"
+                     [class.weekend]="isWeekend(d)"
+                     [style.left.px]="i * dayW"
+                     [style.width.px]="dayW"></div>
+              }
+
+              <!-- Today marker -->
+              @if (todayPx() >= 0 && todayPx() <= totalWidth) {
+                <div class="gantt-today-marker" [style.left.px]="todayPx()"></div>
+              }
+
+              <!-- Gantt bar -->
+              @if (getBar(a.id); as bar) {
+                <div [class]="barCls(a)"
+                     [style.left.px]="bar.left"
+                     [style.width.px]="bar.width"
+                     (click)="openEdit(a)"
+                     [title]="a.title + '  ·  ' + (a.scheduledStart | date:'d MMM') + ' – ' + (a.scheduledEnd | date:'d MMM')">
+                  <span>{{ a.title }}</span>
+                </div>
+              } @else {
+                <span class="no-bar-hint">fuera de la vista</span>
+              }
+
+            </div>
+          </div>
+        }
+
+      </div><!-- /gantt-wrap -->
+    }
+  }
+
+</div><!-- /container-fluid -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     Modal: Editar / Asignar actividad
+════════════════════════════════════════════════════════════════════════════ -->
+@if (editActivity && !isViewer) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1" (click)="closeEdit()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Editar actividad</h5>
+          <button type="button" class="btn-close" (click)="closeEdit()"></button>
+        </div>
+
+        <div class="modal-body">
+          @if (editError) {
+            <div class="alert alert-danger py-2">{{ editError }}</div>
+          }
+
+          <!-- Título (solo lectura) -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-muted">T&iacute;tulo</label>
+            <p class="mb-0 fw-semibold">{{ editActivity.title }}</p>
+          </div>
+
+          <!-- Responsable -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Responsable</label>
+            <select class="form-select" [(ngModel)]="editUserId">
+              <option value="">— Sin asignar —</option>
+              @for (u of users; track u.id) {
+                <option [value]="u.name">
+                  {{ u.name }}@if (u.department) { &mdash; {{ u.department }}}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Fechas -->
+          <div class="row mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Inicio</label>
+              <input type="date" class="form-control" [(ngModel)]="editStart">
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Conclusi&oacute;n</label>
+              <input type="date" class="form-control" [(ngModel)]="editEnd">
+            </div>
+          </div>
+
+          <!-- Prioridad -->
+          <div class="mb-1">
+            <label class="form-label fw-semibold">Prioridad</label>
+            <select class="form-select" [(ngModel)]="editPriority">
+              @for (opt of priorityOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" (click)="closeEdit()">Cancelar</button>
+          <button class="btn btn-primary" (click)="submitEdit()" [disabled]="editSubmitting">
+            {{ editSubmitting ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     Modal: Nueva Actividad
+════════════════════════════════════════════════════════════════════════════ -->
+@if (showCreate) {
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1" (click)="closeCreate()">
+    <div class="modal-dialog modal-lg modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Nueva Actividad</h5>
+          <button type="button" class="btn-close" (click)="closeCreate()"></button>
+        </div>
+
+        <div class="modal-body">
+          @if (createError) {
+            <div class="alert alert-danger py-2">{{ createError }}</div>
+          }
+
+          <form [formGroup]="createForm" novalidate>
+
+            <!-- Título -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">T&iacute;tulo <span class="text-danger">*</span></label>
+              <input formControlName="title" type="text" class="form-control"
+                     [class.is-invalid]="hasCreateErr('title','required') || hasCreateErr('title','minlength') || hasCreateErr('title','maxlength')"
+                     placeholder="Nombre de la actividad">
+              <div class="invalid-feedback">
+                @if (hasCreateErr('title','required'))  { El t&iacute;tulo es requerido. }
+                @if (hasCreateErr('title','minlength')) { M&iacute;nimo 3 caracteres. }
+                @if (hasCreateErr('title','maxlength')) { M&aacute;ximo 100 caracteres. }
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Descripci&oacute;n <span class="text-danger">*</span></label>
+              <textarea formControlName="description" rows="3" class="form-control"
+                        [class.is-invalid]="hasCreateErr('description','required') || hasCreateErr('description','maxlength')"
+                        placeholder="Detalle de la actividad"></textarea>
+              <div class="invalid-feedback">
+                @if (hasCreateErr('description','required'))  { La descripci&oacute;n es requerida. }
+                @if (hasCreateErr('description','maxlength')) { M&aacute;ximo 500 caracteres. }
+              </div>
+            </div>
+
+            <!-- Fechas -->
+            <div class="row mb-1">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Inicio <span class="text-danger">*</span></label>
+                <input formControlName="scheduledStart" type="date" class="form-control"
+                       [class.is-invalid]="hasCreateErr('scheduledStart','required')">
+                <div class="invalid-feedback">Requerida.</div>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Conclusi&oacute;n <span class="text-danger">*</span></label>
+                <input formControlName="scheduledEnd" type="date" class="form-control"
+                       [class.is-invalid]="hasCreateErr('scheduledEnd','required')">
+                <div class="invalid-feedback">Requerida.</div>
+              </div>
+            </div>
+            @if (createForm.hasError('dateRange') && createForm.touched) {
+              <div class="alert alert-warning py-1 small mb-3">
+                La fecha de conclusi&oacute;n debe ser posterior a la de inicio.
+              </div>
+            }
+
+            <!-- Prioridad + Responsable -->
+            <div class="row mb-3 mt-3">
+              <div class="col-6">
+                <label class="form-label fw-semibold">Prioridad</label>
+                <select formControlName="priority" class="form-select">
+                  @for (opt of priorityOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold">Responsable</label>
+                <select formControlName="assignedUserId" class="form-select">
+                  <option value="">— Sin asignar —</option>
+                  @for (u of users; track u.id) {
+                    <option [value]="u.name">
+                      {{ u.name }}@if (u.department) { &mdash; {{ u.department }}}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" (click)="closeCreate()">Cancelar</button>
+          <button class="btn btn-primary" (click)="submitCreate()" [disabled]="createSubmitting">
+            {{ createSubmitting ? 'Guardando...' : 'Crear Actividad' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}

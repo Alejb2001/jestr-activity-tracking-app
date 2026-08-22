@@ -13,6 +13,9 @@
           }
         </span>
       }
+      @if (!isViewer) {
+        <a routerLink="/planning" class="btn btn-outline-light btn-sm">Planificaci&oacute;n</a>
+      }
       @if (hasCompanyModuleAccess) {
         <a [routerLink]="companiesLink" class="btn btn-outline-light btn-sm">Empresas</a>
       }

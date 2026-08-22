@@ -33,6 +33,13 @@ export const routes: Routes = [
         .then(m => m.ActivityFormComponent)
   },
   {
+    path: 'planning',
+    canActivate: [authGuard, editGuard],
+    loadComponent: () =>
+      import('./features/planning/planning.component')
+        .then(m => m.PlanningComponent)
+  },
+  {
     path: 'companies',
     canActivate: [authGuard, companyAccessGuard],
     loadComponent: () =>
