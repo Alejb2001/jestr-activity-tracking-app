@@ -183,7 +183,7 @@ export class ActivityListComponent implements OnInit {
     this.modalSubmitting = true;
     this.modalError = '';
     const { title, description, scheduledStart, scheduledEnd, assignedUserId, priority } = this.createForm.value;
-    this.activityService.create({ title: title!, description: description!, scheduledStart: scheduledStart!, scheduledEnd: scheduledEnd!, assignedUserId: assignedUserId!, priority: priority! }).subscribe({
+    this.activityService.create({ title: title!, description: description!, scheduledStart: scheduledStart!, scheduledEnd: scheduledEnd!, assignedUserId: assignedUserId!, priority: +priority! }).subscribe({
       next: () => {
         this.showModal = false;
         this.modalSubmitting = false;

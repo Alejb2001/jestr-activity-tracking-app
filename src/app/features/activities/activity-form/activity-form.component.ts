@@ -113,14 +113,14 @@ export class ActivityFormComponent implements OnInit {
 
     if (this.isEditMode && this.activityId) {
       this.activityService.update(this.activityId,
-        { title, description, scheduledStart, scheduledEnd, assignedUserId, status, priority }
+        { title, description, scheduledStart, scheduledEnd, assignedUserId, status: +status, priority: +priority }
       ).subscribe({
         next:  () => this.router.navigate(['/activities']),
         error: () => { this.error = 'Error al actualizar.'; this.submitting = false; }
       });
     } else {
       this.activityService.create(
-        { title, description, scheduledStart, scheduledEnd, assignedUserId, priority }
+        { title, description, scheduledStart, scheduledEnd, assignedUserId, priority: +priority }
       ).subscribe({
         next:  () => this.router.navigate(['/activities']),
         error: () => { this.error = 'Error al crear la actividad.'; this.submitting = false; }
