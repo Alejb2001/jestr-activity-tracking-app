@@ -1,0 +1,64 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+
+      <h2 class="mb-4">Mi Perfil</h2>
+
+      @if (currentUser) {
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+
+            <!-- Avatar -->
+            <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+              <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center"
+                   style="width:56px;height:56px;font-size:22px;flex-shrink:0">
+                {{ currentUser.username.charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <h5 class="mb-0">{{ currentUser.name || currentUser.username }}</h5>
+                <span class="text-muted small">@{{ currentUser.username }}</span>
+              </div>
+            </div>
+
+            <!-- Datos -->
+            <dl class="row mb-0">
+
+              <dt class="col-5 text-muted small fw-semibold">Usuario</dt>
+              <dd class="col-7">{{ currentUser.username }}</dd>
+
+              @if (currentUser.name) {
+                <dt class="col-5 text-muted small fw-semibold">Nombre</dt>
+                <dd class="col-7">{{ currentUser.name }}</dd>
+              }
+
+              <dt class="col-5 text-muted small fw-semibold">Rol</dt>
+              <dd class="col-7">
+                <span class="badge"
+                      [class.bg-warning]="currentUser.role === 'admin' || currentUser.role === 'company_admin'"
+                      [class.text-dark]="currentUser.role === 'admin' || currentUser.role === 'company_admin'"
+                      [class.bg-secondary]="currentUser.role === 'viewer' || currentUser.role === 'company_viewer'">
+                  {{ roleLabel }}
+                </span>
+              </dd>
+
+              @if (currentUser.companyName) {
+                <dt class="col-5 text-muted small fw-semibold">Empresa</dt>
+                <dd class="col-7">{{ currentUser.companyName }}</dd>
+              }
+
+              @if (!currentUser.companyName) {
+                <dt class="col-5 text-muted small fw-semibold">Acceso</dt>
+                <dd class="col-7"><span class="badge bg-warning text-dark">Global</span></dd>
+              }
+
+            </dl>
+
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

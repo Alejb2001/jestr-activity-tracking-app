@@ -1,12 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ActivityService } from '../../../core/services/activity.service';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Activity, ActivityPriority, ActivityPriorityLabels, ActivityStatus, ActivityStatusLabels } from '../../../core/models/activity.model';
 import { User } from '../../../core/models/user.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
   const start = group.get('scheduledStart')?.value;
@@ -17,7 +18,7 @@ function dateRangeValidator(group: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-activity-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './activity-list.component.html'
 })
 export class ActivityListComponent implements OnInit {
@@ -64,7 +65,6 @@ export class ActivityListComponent implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly userService = inject(UserService);
 
   readonly currentUser = this.auth.getCurrentUser();
@@ -86,24 +86,12 @@ export class ActivityListComponent implements OnInit {
     return this.auth.hasCompanyModuleAccess();
   }
 
-  get companiesLink(): string[] {
-    if (this.auth.isCompanyAdmin() && this.currentUser?.companyId) {
-      return ['/companies', this.currentUser.companyId.toString()];
-    }
-    return ['/companies'];
-  }
-
   hasModalError(field: string, error: string): boolean {
     const ctrl = this.createForm.get(field);
     return !!(ctrl?.hasError(error) && ctrl.touched);
   }
 
   constructor(private activityService: ActivityService) {}
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
 
   ngOnInit(): void {
     this.load();

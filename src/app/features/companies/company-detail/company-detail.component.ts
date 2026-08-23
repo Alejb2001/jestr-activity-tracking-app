@@ -1,15 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompanyService } from '../../../core/services/company.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Company, CompanyUser } from '../../../core/models/company.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-company-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './company-detail.component.html'
 })
 export class CompanyDetailComponent implements OnInit {
@@ -22,8 +23,7 @@ export class CompanyDetailComponent implements OnInit {
   showUserForm = false;
   companyId!: number;
 
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly auth  = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
   readonly currentUser = this.auth.getCurrentUser();
@@ -107,8 +107,4 @@ export class CompanyDetailComponent implements OnInit {
     return role === 'company_admin' ? 'Administrador' : 'Usuario';
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
 }

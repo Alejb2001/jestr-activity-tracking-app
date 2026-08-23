@@ -7,12 +7,14 @@ export const routes: Routes = [
   { path: '', redirectTo: 'activities', pathMatch: 'full' },
   {
     path: 'login',
+    title: 'Iniciar sesi\u00f3n',
     loadComponent: () =>
       import('./features/auth/login/login.component')
         .then(m => m.LoginComponent)
   },
   {
     path: 'activities',
+    title: 'Actividades',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/activities/activity-list/activity-list.component')
@@ -20,6 +22,7 @@ export const routes: Routes = [
   },
   {
     path: 'activities/new',
+    title: 'Nueva Actividad',
     canActivate: [authGuard, editGuard],
     loadComponent: () =>
       import('./features/activities/activity-form/activity-form.component')
@@ -27,6 +30,7 @@ export const routes: Routes = [
   },
   {
     path: 'activities/:id/edit',
+    title: 'Editar Actividad',
     canActivate: [authGuard, editGuard],
     loadComponent: () =>
       import('./features/activities/activity-form/activity-form.component')
@@ -34,13 +38,23 @@ export const routes: Routes = [
   },
   {
     path: 'planning',
+    title: 'Planificaci\u00f3n',
     canActivate: [authGuard, editGuard],
     loadComponent: () =>
       import('./features/planning/planning.component')
         .then(m => m.PlanningComponent)
   },
   {
+    path: 'profile',
+    title: 'Mi Perfil',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/profile.component')
+        .then(m => m.ProfileComponent)
+  },
+  {
     path: 'companies',
+    title: 'Empresas',
     canActivate: [authGuard, companyAccessGuard],
     loadComponent: () =>
       import('./features/companies/company-list/company-list.component')
@@ -48,6 +62,7 @@ export const routes: Routes = [
   },
   {
     path: 'companies/:id',
+    title: 'Detalle de Empresa',
     canActivate: [authGuard, companyAccessGuard],
     loadComponent: () =>
       import('./features/companies/company-detail/company-detail.component')

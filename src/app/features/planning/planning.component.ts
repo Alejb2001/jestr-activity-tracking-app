@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import {
   AbstractControl, FormBuilder, FormsModule,
   ReactiveFormsModule, ValidationErrors, Validators
@@ -13,6 +13,7 @@ import {
   ActivityStatus, ActivityStatusLabels
 } from '../../core/models/activity.model';
 import { User } from '../../core/models/user.model';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 const DAY_MS = 86_400_000;
 const DAY_W  = 38;   // px por día
@@ -29,7 +30,7 @@ interface GanttBar { left: number; width: number; }
 @Component({
   selector: 'app-planning',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './planning.component.html',
   styles: [`
     .gantt-wrap{overflow:auto;max-height:calc(100vh - 270px);border:1px solid #dee2e6;border-radius:.5rem;background:#fff}
@@ -100,11 +101,8 @@ export class PlanningComponent implements OnInit {
 
   private readonly fb      = inject(FormBuilder);
   private readonly auth    = inject(AuthService);
-  private readonly router  = inject(Router);
   private readonly userSvc = inject(UserService);
   private readonly actSvc  = inject(ActivityService);
-
-  readonly currentUser = this.auth.getCurrentUser();
 
   createForm = this.fb.group({
     title:          ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -115,13 +113,7 @@ export class PlanningComponent implements OnInit {
     priority:       [ActivityPriority.Medium, Validators.required],
   }, { validators: dateRangeValidator });
 
-  get isViewer()         { return this.auth.isViewer(); }
-  get hasCompanyAccess() { return this.auth.hasCompanyModuleAccess(); }
-  get companiesLink(): string[] {
-    return this.auth.isCompanyAdmin() && this.currentUser?.companyId
-      ? ['/companies', this.currentUser.companyId.toString()]
-      : ['/companies'];
-  }
+  get isViewer()   { return this.auth.isViewer(); }
   get totalWidth() { return this.viewDays * DAY_W; }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -315,5 +307,4 @@ export class PlanningComponent implements OnInit {
     });
   }
 
-  logout(): void { this.auth.logout(); this.router.navigateByUrl('/login'); }
 }

@@ -1,15 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompanyService } from '../../../core/services/company.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Company } from '../../../core/models/company.model';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-company-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './company-list.component.html'
 })
 export class CompanyListComponent implements OnInit {
@@ -20,9 +21,6 @@ export class CompanyListComponent implements OnInit {
   showForm = false;
 
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-
-  readonly currentUser = this.auth.getCurrentUser();
 
   form = inject(FormBuilder).group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -72,8 +70,4 @@ export class CompanyListComponent implements OnInit {
     });
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/login');
-  }
 }
