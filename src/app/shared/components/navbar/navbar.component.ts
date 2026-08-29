@@ -139,7 +139,7 @@ import { AuthService } from '../../../core/services/auth.service';
           </a>
         }
 
-        @if (hasCompanyAccess) {
+        @if (isGlobalAdmin) {
           <a [routerLink]="companiesLink"
              routerLinkActive="active"
              class="sidebar-link d-flex align-items-center gap-3 px-4 py-3"
@@ -149,6 +149,21 @@ import { AuthService } from '../../../core/services/auth.service';
               <polyline points="9,22 9,12 15,12 15,22"/>
             </svg>
             Empresas
+          </a>
+        }
+
+        @if (hasCompanyAccess) {
+          <a [routerLink]="usersLink"
+             routerLinkActive="active"
+             class="sidebar-link d-flex align-items-center gap-3 px-4 py-3"
+             (click)="closeSidebar()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9"  cy="7" r="4"/>
+              <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+              <line x1="17" y1="11" x2="17" y2="17"/>
+              <line x1="14" y1="14" x2="20" y2="14"/>
+            </svg>
+            Usuarios
           </a>
         }
 
@@ -229,6 +244,7 @@ export class NavbarComponent {
 
   get currentUser()     { return this.auth.getCurrentUser(); }
   get isViewer()        { return this.auth.isViewer(); }
+  get isGlobalAdmin()   { return this.auth.isGlobalAdmin(); }
   get hasCompanyAccess(){ return this.auth.hasCompanyModuleAccess(); }
 
   get brandName(): string {
@@ -254,6 +270,12 @@ export class NavbarComponent {
       const id = this.auth.getCurrentUser()?.companyId;
       if (id) return ['/companies', id.toString()];
     }
+    return ['/companies'];
+  }
+
+  get usersLink(): string[] {
+    const id = this.auth.getCurrentUser()?.companyId;
+    if (id) return ['/companies', id.toString()];
     return ['/companies'];
   }
 
