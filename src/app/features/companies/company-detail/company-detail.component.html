@@ -155,11 +155,17 @@
                   </span>
                 </td>
                 <td class="text-end">
-                  <button *ngIf="u.isActive"
-                          class="btn btn-sm btn-outline-danger"
-                          (click)="deactivateUser(u.id, u.name)">
-                    Desactivar
-                  </button>
+                  <div class="d-flex gap-1 justify-content-end">
+                    <button class="btn btn-sm btn-outline-primary"
+                            (click)="openEdit(u)">
+                      Editar
+                    </button>
+                    <button *ngIf="u.isActive"
+                            class="btn btn-sm btn-outline-danger"
+                            (click)="deactivateUser(u.id, u.name)">
+                      Desactivar
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -171,4 +177,102 @@
 
   </ng-container>
 
+</div>
+
+<!-- ── Modal de edición de usuario ─────────────────────────────────────── -->
+<div *ngIf="editingUser"
+     style="position:fixed;inset:0;z-index:1050;display:flex;align-items:center;justify-content:center">
+
+  <!-- Backdrop -->
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5)"
+       (click)="cancelEdit()">
+  </div>
+
+  <!-- Panel -->
+  <div style="position:relative;background:#fff;border-radius:12px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.25)"
+       class="mx-3">
+
+    <!-- Cabecera -->
+    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+      <h5 class="mb-0 fw-semibold">Editar usuario</h5>
+      <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="editForm" (ngSubmit)="saveEdit()" novalidate class="p-4">
+
+      <div *ngIf="editError" class="alert alert-danger py-2 small">{{ editError }}</div>
+
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Nombre completo <span class="text-danger">*</span></label>
+          <input formControlName="name" type="text" class="form-control"
+                 [class.is-invalid]="hasEditError('name','required') || hasEditError('name','maxlength')">
+          <div class="invalid-feedback">
+            <span *ngIf="hasEditError('name','required')">Requerido.</span>
+            <span *ngIf="hasEditError('name','maxlength')">Máximo 100 caracteres.</span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+          <input formControlName="email" type="email" class="form-control"
+                 [class.is-invalid]="hasEditError('email','required') || hasEditError('email','email')">
+          <div class="invalid-feedback">
+            <span *ngIf="hasEditError('email','required')">Requerido.</span>
+            <span *ngIf="hasEditError('email','email')">Correo inválido.</span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Usuario (login) <span class="text-danger">*</span></label>
+          <input formControlName="username" type="text" class="form-control"
+                 [class.is-invalid]="hasEditError('username','required') || hasEditError('username','minlength') || hasEditError('username','maxlength')">
+          <div class="invalid-feedback">
+            <span *ngIf="hasEditError('username','required')">Requerido.</span>
+            <span *ngIf="hasEditError('username','minlength')">Mínimo 3 caracteres.</span>
+            <span *ngIf="hasEditError('username','maxlength')">Máximo 50 caracteres.</span>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Nueva contraseña <span class="text-muted small">(dejar vacío para no cambiar)</span></label>
+          <input formControlName="password" type="password" class="form-control"
+                 placeholder="Mínimo 8 caracteres"
+                 [class.is-invalid]="hasEditError('password','minlength')">
+          <div class="invalid-feedback">Mínimo 8 caracteres.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Departamento</label>
+          <input formControlName="department" type="text" class="form-control" placeholder="Opcional">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Rol <span class="text-danger">*</span></label>
+          <select formControlName="role" class="form-select">
+            <option *ngFor="let opt of roleOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input formControlName="isActive" type="checkbox" class="form-check-input" id="editIsActive">
+            <label class="form-check-label" for="editIsActive">Usuario activo</label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="editSubmitting">
+          {{ editSubmitting ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>

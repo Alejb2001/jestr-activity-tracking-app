@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Company, CompanyUser,
-  CreateCompanyPayload, CreateCompanyUserPayload, UpdateCompanyPayload
+  CreateCompanyPayload, CreateCompanyUserPayload, UpdateCompanyPayload, UpdateCompanyUserPayload
 } from '../models/company.model';
 
 @Injectable({ providedIn: 'root' })
@@ -43,6 +43,10 @@ export class CompanyService {
 
   createUser(companyId: number, payload: CreateCompanyUserPayload): Observable<CompanyUser> {
     return this.http.post<CompanyUser>(`${this.baseUrl}/${companyId}/users`, payload);
+  }
+
+  updateUser(companyId: number, userId: number, payload: UpdateCompanyUserPayload): Observable<CompanyUser> {
+    return this.http.put<CompanyUser>(`${this.baseUrl}/${companyId}/users/${userId}`, payload);
   }
 
   deactivateUser(companyId: number, userId: number): Observable<void> {

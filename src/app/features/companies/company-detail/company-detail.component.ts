@@ -23,24 +23,40 @@ export class CompanyDetailComponent implements OnInit {
   showUserForm = false;
   companyId!: number;
 
+  // Edición
+  editingUser: CompanyUser | null = null;
+  editSubmitting = false;
+  editError = '';
+
   private readonly auth  = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly fb    = inject(FormBuilder);
 
-  readonly currentUser = this.auth.getCurrentUser();
+  readonly currentUser   = this.auth.getCurrentUser();
   readonly isGlobalAdmin = this.auth.isGlobalAdmin();
 
   readonly roleOptions = [
-    { value: 'company_admin', label: 'Administrador de empresa' },
+    { value: 'company_admin',  label: 'Administrador de empresa' },
     { value: 'company_viewer', label: 'Usuario (solo lectura)' }
   ];
 
-  userForm = inject(FormBuilder).group({
+  userForm = this.fb.group({
     name:       ['', [Validators.required, Validators.maxLength(100)]],
     email:      ['', [Validators.required, Validators.email]],
     department: ['', Validators.maxLength(100)],
     role:       ['company_viewer', Validators.required],
     username:   ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     password:   ['', [Validators.required, Validators.minLength(8)]]
+  });
+
+  editForm = this.fb.group({
+    name:       ['', [Validators.required, Validators.maxLength(100)]],
+    email:      ['', [Validators.required, Validators.email]],
+    department: ['', Validators.maxLength(100)],
+    role:       ['company_viewer', Validators.required],
+    username:   ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+    password:   ['', Validators.minLength(8)],   // opcional al editar
+    isActive:   [true]
   });
 
   constructor(private companyService: CompanyService) {}
@@ -73,6 +89,11 @@ export class CompanyDetailComponent implements OnInit {
     return !!(ctrl?.hasError(error) && ctrl.touched);
   }
 
+  hasEditError(field: string, error: string): boolean {
+    const ctrl = this.editForm.get(field);
+    return !!(ctrl?.hasError(error) && ctrl.touched);
+  }
+
   createUser(): void {
     if (this.userForm.invalid) { this.userForm.markAllAsTouched(); return; }
     this.submitting = true;
@@ -91,7 +112,55 @@ export class CompanyDetailComponent implements OnInit {
         this.submitting = false;
         this.loadUsers();
       },
-      error: () => { this.error = 'Error al crear el usuario.'; this.submitting = false; }
+      error: (err) => {
+        this.error = err?.error?.message ?? 'Error al crear el usuario.';
+        this.submitting = false;
+      }
+    });
+  }
+
+  openEdit(user: CompanyUser): void {
+    this.editingUser = user;
+    this.editError   = '';
+    this.editForm.reset({
+      name:       user.name,
+      email:      user.email,
+      department: user.department,
+      role:       user.role,
+      username:   user.username,
+      password:   '',
+      isActive:   user.isActive
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingUser = null;
+    this.editError   = '';
+  }
+
+  saveEdit(): void {
+    if (this.editForm.invalid) { this.editForm.markAllAsTouched(); return; }
+    this.editSubmitting = true;
+    this.editError      = '';
+    const v = this.editForm.value;
+    this.companyService.updateUser(this.companyId, this.editingUser!.id, {
+      name:       v.name!,
+      email:      v.email!,
+      department: v.department ?? '',
+      role:       v.role as 'company_admin' | 'company_viewer',
+      username:   v.username!,
+      password:   v.password ?? undefined,
+      isActive:   v.isActive ?? true
+    }).subscribe({
+      next: () => {
+        this.editSubmitting = false;
+        this.editingUser    = null;
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.editError      = err?.error?.message ?? 'Error al actualizar el usuario.';
+        this.editSubmitting = false;
+      }
     });
   }
 
@@ -106,5 +175,4 @@ export class CompanyDetailComponent implements OnInit {
   roleLabel(role: string): string {
     return role === 'company_admin' ? 'Administrador' : 'Usuario';
   }
-
 }

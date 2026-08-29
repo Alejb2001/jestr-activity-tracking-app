@@ -34,3 +34,13 @@ export interface CreateCompanyUserPayload {
   username: string;
   password: string;
 }
+
+export interface UpdateCompanyUserPayload {
+  username: string;
+  password?: string;
+  name: string;
+  email: string;
+  department: string;
+  role: 'company_admin' | 'company_viewer';
+  isActive: boolean;
+}
