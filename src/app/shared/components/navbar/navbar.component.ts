@@ -11,8 +11,11 @@ import { AuthService } from '../../../core/services/auth.service';
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
       <div class="container">
 
-        <!-- Brand: nombre de empresa o "Activity Tracker" -->
-        <a class="navbar-brand fw-bold" routerLink="/activities">{{ brandName }}</a>
+        <!-- Brand: empresa + usuario logueado -->
+        <a class="navbar-brand lh-1 py-1" routerLink="/activities">
+          <span class="fw-bold d-block" style="font-size:1rem;line-height:1.2">{{ brandName }}</span>
+          <span class="d-block" style="font-size:11px;font-weight:400;opacity:0.85;line-height:1.3">{{ currentUser?.username }}</span>
+        </a>
 
         <!-- Links de navegación -->
         <div class="d-flex align-items-center gap-2 me-3">
