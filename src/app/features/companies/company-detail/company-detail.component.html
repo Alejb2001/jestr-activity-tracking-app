@@ -29,7 +29,18 @@
       }
     </div>
 
-    <!-- Sección usuarios -->
+    <!-- Tabs -->
+    <div class="border-bottom mb-3 d-flex gap-1">
+      <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+        Usuarios
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'roles'" (click)="activeTab = 'roles'">
+        Roles y Permisos
+      </button>
+    </div>
+
+    <!-- ── Tab Usuarios ─────────────────────────────────────────────────── -->
+    <div *ngIf="activeTab === 'users'">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <span class="fw-semibold">Usuarios de la empresa</span>
@@ -97,10 +108,19 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Rol <span class="text-danger">*</span></label>
+                <label class="form-label">Acceso base <span class="text-danger">*</span></label>
                 <select formControlName="role" class="form-select">
                   <option *ngFor="let opt of roleOptions" [value]="opt.value">{{ opt.label }}</option>
                 </select>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Rol personalizado <span class="text-muted small">(opcional)</span></label>
+                <select formControlName="companyRoleId" class="form-select">
+                  <option [value]="null">— Sin rol personalizado —</option>
+                  <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
+                </select>
+                <div class="form-text">Define permisos específicos para este usuario.</div>
               </div>
 
               <div class="col-12">
@@ -174,9 +194,148 @@
 
       </div>
     </div>
+    </div><!-- /tab usuarios -->
+
+    <!-- ── Tab Roles ──────────────────────────────────────────────────────── -->
+    <div *ngIf="activeTab === 'roles'">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold">Roles y permisos personalizados</span>
+          <button class="btn btn-primary btn-sm" (click)="openNewRole()">+ Nuevo Rol</button>
+        </div>
+        <div class="card-body">
+
+          <div *ngIf="rolesLoading" class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+            <span class="ms-2 text-muted small">Cargando roles...</span>
+          </div>
+
+          <div *ngIf="!rolesLoading && roles.length === 0" class="text-muted text-center py-3">
+            No hay roles personalizados. Crea uno para asignarlo a usuarios.
+          </div>
+
+          <div *ngIf="!rolesLoading && roles.length > 0" class="row g-3">
+            <div class="col-md-6" *ngFor="let r of roles">
+              <div class="border rounded p-3 h-100">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <span class="fw-semibold">{{ r.name }}</span>
+                    <span *ngIf="!r.isActive" class="badge bg-secondary ms-2" style="font-size:10px">Inactivo</span>
+                  </div>
+                  <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-primary" (click)="openEditRole(r)">Editar</button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteRole(r)">Eliminar</button>
+                  </div>
+                </div>
+                <div *ngIf="r.permissions.length === 0" class="text-muted small">Sin permisos asignados.</div>
+                <div class="d-flex flex-wrap gap-1">
+                  <span *ngFor="let p of r.permissions"
+                        class="badge bg-light text-dark border"
+                        style="font-size:11px">
+                    {{ permLabel(p) }}
+                  </span>
+                </div>
+                <div *ngIf="r.permissions.length > 0" class="text-muted" style="font-size:11px;margin-top:4px">
+                  {{ r.permissions.length }} permiso(s)
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /tab roles -->
 
   </ng-container>
 
+</div>
+
+<!-- ── Modal crear/editar rol ──────────────────────────────────────────── -->
+<div *ngIf="showRoleForm"
+     style="position:fixed;inset:0;z-index:1050;display:flex;align-items:center;justify-content:center">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5)" (click)="cancelRoleForm()"></div>
+  <div style="position:relative;background:#fff;border-radius:12px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.25)"
+       class="mx-3">
+
+    <div class="d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
+      <h5 class="mb-0 fw-semibold">{{ editingRole ? 'Editar rol' : 'Nuevo rol' }}</h5>
+      <button type="button" class="btn-close" (click)="cancelRoleForm()"></button>
+    </div>
+
+    <form [formGroup]="roleForm" (ngSubmit)="saveRole()" novalidate class="p-4">
+
+      <div *ngIf="roleError" class="alert alert-danger py-2 small">{{ roleError }}</div>
+
+      <div class="mb-4">
+        <label class="form-label">Nombre del rol <span class="text-danger">*</span></label>
+        <input formControlName="name" type="text" class="form-control"
+               placeholder="Ej: Supervisor, Analista..."
+               [class.is-invalid]="roleForm.get('name')?.invalid && roleForm.get('name')?.touched">
+        <div class="invalid-feedback">El nombre es requerido.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Permisos</label>
+        <div class="border rounded p-3" style="background:#f8f9fa">
+          <div *ngFor="let group of permissionGroups" class="mb-3">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <input type="checkbox"
+                     class="form-check-input"
+                     [checked]="isGroupAllChecked(group)"
+                     [indeterminate]="isGroupPartialChecked(group)"
+                     (change)="toggleGroupPermissions(group)"
+                     [id]="'grp_' + group">
+              <label class="perm-group-label mb-0" [for]="'grp_' + group">{{ group }}</label>
+            </div>
+            <div class="row g-2 ps-3">
+              <div class="col-6" *ngFor="let perm of permissionsOfGroup(group)">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox"
+                         [checked]="rolePermissions.has(perm.key)"
+                         (change)="togglePermission(perm.key)"
+                         [id]="'perm_' + perm.key">
+                  <label class="form-check-label" style="font-size:13px" [for]="'perm_' + perm.key">
+                    {{ perm.label }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-text">{{ rolePermissions.size }} permiso(s) seleccionado(s).</div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancelRoleForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="roleSubmitting">
+          {{ roleSubmitting ? 'Guardando...' : (editingRole ? 'Guardar cambios' : 'Crear rol') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ── Confirmar eliminación de rol ────────────────────────────────────── -->
+<div *ngIf="deleteRoleConfirm"
+     style="position:fixed;inset:0;z-index:1060;display:flex;align-items:center;justify-content:center">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55)" (click)="cancelDeleteRole()"></div>
+  <div style="position:relative;background:#fff;border-radius:12px;padding:28px 24px;width:320px;max-width:90vw;box-shadow:0 12px 40px rgba(0,0,0,0.25);text-align:center">
+    <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
+        <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/>
+        <path d="M10,11v6"/><path d="M14,11v6"/><path d="M9,6V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/>
+      </svg>
+    </div>
+    <h5 class="mb-1 fw-semibold">¿Eliminar rol?</h5>
+    <p class="text-muted mb-0" style="font-size:14px">
+      Se eliminará <strong>{{ deleteRoleConfirm?.name }}</strong>. Los usuarios asignados quedarán sin rol personalizado.
+    </p>
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-outline-secondary flex-fill" (click)="cancelDeleteRole()">Cancelar</button>
+      <button class="btn btn-danger flex-fill" (click)="deleteRole()">Eliminar</button>
+    </div>
+  </div>
 </div>
 
 <!-- ── Modal de edición de usuario ─────────────────────────────────────── -->
@@ -250,9 +409,17 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label">Rol <span class="text-danger">*</span></label>
+          <label class="form-label">Acceso base <span class="text-danger">*</span></label>
           <select formControlName="role" class="form-select">
             <option *ngFor="let opt of roleOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Rol personalizado <span class="text-muted small">(opcional)</span></label>
+          <select formControlName="companyRoleId" class="form-select">
+            <option [value]="null">— Sin rol personalizado —</option>
+            <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
           </select>
         </div>
 

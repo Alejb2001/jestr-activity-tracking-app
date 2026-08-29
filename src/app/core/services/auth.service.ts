@@ -10,6 +10,7 @@ export interface StoredUser {
   role: string;
   companyId?: number;
   companyName?: string;
+  permissions: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -27,7 +28,8 @@ export class AuthService {
           name: response.name,
           role: response.role,
           companyId: response.companyId,
-          companyName: response.companyName
+          companyName: response.companyName,
+          permissions: response.permissions ?? []
         }));
       })
     );
@@ -66,5 +68,18 @@ export class AuthService {
 
   hasCompanyModuleAccess(): boolean {
     return this.isGlobalAdmin() || this.isCompanyAdmin();
+  }
+
+  hasPermission(key: string): boolean {
+    const user = this.getCurrentUser();
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    const perms = user.permissions ?? [];
+    if (perms.length > 0) return perms.includes(key);
+    // Defaults cuando no hay rol personalizado
+    if (user.role === 'company_admin') return true;
+    if (user.role === 'viewer' || user.role === 'company_viewer')
+      return ['activities.view', 'planning.view'].includes(key);
+    return false;
   }
 }

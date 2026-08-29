@@ -33,6 +33,7 @@ export interface CreateCompanyUserPayload {
   role: 'company_admin' | 'company_viewer';
   username: string;
   password: string;
+  companyRoleId?: number;
 }
 
 export interface UpdateCompanyUserPayload {
@@ -43,4 +44,5 @@ export interface UpdateCompanyUserPayload {
   department: string;
   role: 'company_admin' | 'company_viewer';
   isActive: boolean;
+  companyRoleId?: number;
 }

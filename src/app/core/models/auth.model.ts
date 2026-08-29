@@ -12,4 +12,5 @@ export interface AuthResponse {
   companyId?: number;
   companyName?: string;
   expiresAt: string;
+  permissions: string[];
 }
