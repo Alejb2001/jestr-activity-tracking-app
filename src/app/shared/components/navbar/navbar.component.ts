@@ -44,9 +44,12 @@ import { AuthService } from '../../../core/services/auth.service';
       <div class="container d-flex align-items-center justify-content-between">
 
         <!-- Brand: empresa + usuario logueado -->
-        <a class="navbar-brand p-0 m-0" routerLink="/activities" style="white-space:normal;line-height:1">
-          <span style="display:block;font-size:1.25rem;font-weight:700;line-height:1.25">{{ brandName }}</span>
-          <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;line-height:1.4">{{ currentUser?.username }}</span>
+        <a class="navbar-brand p-0 m-0 d-flex align-items-center gap-2" routerLink="/activities" style="white-space:normal;line-height:1">
+          <img src="favicon.ico" alt="Jestr" style="width:36px;height:36px;object-fit:contain;filter:brightness(0) invert(1)">
+          <div>
+            <span style="display:block;font-size:1.25rem;font-weight:700;line-height:1.25">{{ brandName }}</span>
+            <span style="display:block;font-size:13px;font-weight:400;opacity:0.85;line-height:1.4">{{ currentUser?.username }}</span>
+          </div>
         </a>
 
         <!-- Botón hamburger (extremo derecho) -->

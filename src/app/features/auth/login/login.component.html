@@ -1,7 +1,10 @@
 <div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
   <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
     <div class="card-body p-4">
-      <h4 class="card-title text-center mb-4 fw-bold">Activity Tracker</h4>
+      <div class="text-center mb-3">
+        <img src="favicon.ico" alt="Jestr" style="width:72px;height:72px;object-fit:contain">
+      </div>
+      <h4 class="card-title text-center mb-2 fw-bold">Activity Tracker</h4>
       <p class="text-center text-muted mb-4">Inicia sesi&oacute;n para continuar</p>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
