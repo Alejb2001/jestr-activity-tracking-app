@@ -29,7 +29,8 @@ export class LoginComponent implements OnInit {
   private readonly notifications = inject(NotificationService);
   private readonly companyService = inject(CompanyService);
 
-  loading = false;
+  loading      = false;
+  showPassword = false;
   companies: { name: string; code: string }[] = [];
 
   form = this.fb.group({

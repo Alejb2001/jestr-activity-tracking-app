@@ -48,16 +48,33 @@
 
         <div class="mb-4">
           <label for="password" class="form-label">Contrase&ntilde;a</label>
-          <input
-            id="password"
-            type="password"
-            class="form-control"
-            [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
-            formControlName="password"
-            placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-            autocomplete="current-password"
-          />
-          <div class="invalid-feedback">La contrase&ntilde;a es requerida.</div>
+          <div class="input-group has-validation">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              class="form-control"
+              [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+              formControlName="password"
+              placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+              autocomplete="current-password"
+            />
+            <button class="btn btn-outline-secondary" type="button" (click)="showPassword = !showPassword"
+                    [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+              @if (showPassword) {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+            <div class="invalid-feedback">La contrase&ntilde;a es requerida.</div>
+          </div>
         </div>
 
         <p class="text-center mb-3" style="font-size:13px">

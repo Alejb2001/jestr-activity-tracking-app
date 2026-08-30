@@ -1,8 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RegistrationService } from '../../core/services/registration.service';
+
+function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const pw  = group.get('adminPassword')?.value;
+  const cpw = group.get('adminPasswordConfirm')?.value;
+  return pw && cpw && pw !== cpw ? { passwordMismatch: true } : null;
+}
 
 @Component({
   selector: 'app-register',
@@ -14,21 +20,29 @@ export class RegisterComponent {
   private readonly fb  = inject(FormBuilder);
   private readonly svc = inject(RegistrationService);
 
-  submitting = false;
-  submitted  = false;
-  error      = '';
+  submitting            = false;
+  submitted             = false;
+  error                 = '';
+  showPassword          = false;
+  showPasswordConfirm   = false;
 
   form = this.fb.group({
-    companyName:   ['', [Validators.required, Validators.maxLength(100)]],
-    contactName:   ['', [Validators.required, Validators.maxLength(100)]],
-    contactEmail:  ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
-    adminUsername: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-    adminPassword: ['', [Validators.required, Validators.minLength(8)]]
-  });
+    companyName:          ['', [Validators.required, Validators.maxLength(100)]],
+    contactName:          ['', [Validators.required, Validators.maxLength(100)]],
+    contactEmail:         ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
+    adminUsername:        ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+    adminPassword:        ['', [Validators.required, Validators.minLength(8)]],
+    adminPasswordConfirm: ['', Validators.required]
+  }, { validators: passwordMatchValidator });
 
   hasError(field: string, error: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.hasError(error) && ctrl.touched);
+  }
+
+  get passwordMismatch(): boolean {
+    return !!this.form.hasError('passwordMismatch') &&
+      !!this.form.get('adminPasswordConfirm')?.touched;
   }
 
   submit(): void {

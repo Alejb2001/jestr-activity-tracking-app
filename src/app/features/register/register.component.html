@@ -59,7 +59,7 @@
               <p class="text-muted mb-2" style="font-size:13px">Credenciales para el administrador de la empresa:</p>
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-12">
               <label class="form-label fw-semibold">Usuario admin <span class="text-danger">*</span></label>
               <input type="text" class="form-control" formControlName="adminUsername"
                      placeholder="Nombre de usuario"
@@ -68,13 +68,59 @@
               <div class="invalid-feedback">Mín. 3 caracteres.</div>
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-12">
               <label class="form-label fw-semibold">Contrase&ntilde;a <span class="text-danger">*</span></label>
-              <input type="password" class="form-control" formControlName="adminPassword"
-                     placeholder="Mín. 8 caracteres"
-                     autocomplete="new-password"
-                     [class.is-invalid]="hasError('adminPassword','required') || hasError('adminPassword','minlength')">
-              <div class="invalid-feedback">Mín. 8 caracteres.</div>
+              <div class="input-group has-validation">
+                <input [type]="showPassword ? 'text' : 'password'" class="form-control" formControlName="adminPassword"
+                       placeholder="Mín. 8 caracteres"
+                       autocomplete="new-password"
+                       [class.is-invalid]="hasError('adminPassword','required') || hasError('adminPassword','minlength')">
+                <button class="btn btn-outline-secondary" type="button" (click)="showPassword = !showPassword"
+                        [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                  @if (showPassword) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+                <div class="invalid-feedback">Mín. 8 caracteres.</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Confirmar contrase&ntilde;a <span class="text-danger">*</span></label>
+              <div class="input-group has-validation">
+                <input [type]="showPasswordConfirm ? 'text' : 'password'" class="form-control" formControlName="adminPasswordConfirm"
+                       placeholder="Repite la contraseña"
+                       autocomplete="new-password"
+                       [class.is-invalid]="hasError('adminPasswordConfirm','required') || passwordMismatch">
+                <button class="btn btn-outline-secondary" type="button" (click)="showPasswordConfirm = !showPasswordConfirm"
+                        [attr.aria-label]="showPasswordConfirm ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                  @if (showPasswordConfirm) {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  }
+                </button>
+                <div class="invalid-feedback">
+                  @if (hasError('adminPasswordConfirm','required')) { Requerido. }
+                  @else { Las contraseñas no coinciden. }
+                </div>
+              </div>
             </div>
 
           </div>
