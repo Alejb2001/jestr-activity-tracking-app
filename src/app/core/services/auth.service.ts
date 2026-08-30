@@ -19,6 +19,14 @@ export class AuthService {
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'auth_user';
 
+  forgotPassword(email: string) {
+    return this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post(`${environment.apiUrl}/auth/reset-password`, { token, newPassword });
+  }
+
   login(payload: LoginPayload) {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload).pipe(
       tap(response => {

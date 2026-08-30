@@ -77,9 +77,10 @@
           </div>
         </div>
 
-        <p class="text-center mb-3" style="font-size:13px">
-          ¿Empresa nueva? <a routerLink="/register">Solicita acceso</a>
-        </p>
+        <div class="d-flex justify-content-between mb-3" style="font-size:13px">
+          <a routerLink="/forgot-password">¿Olvidaste tu contraseña?</a>
+          <a routerLink="/register">Solicitar acceso</a>
+        </div>
 
         <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
           @if (loading) {
