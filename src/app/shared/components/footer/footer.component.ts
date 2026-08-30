@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-footer',
   standalone: true,
   imports: [RouterModule],
+  styles: [':host { margin-top: auto; display: block; }'],
   template: `
     <footer class="bg-primary text-white mt-5 py-3" style="border-top:3px solid rgba(0,0,0,0.15)">
       <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
