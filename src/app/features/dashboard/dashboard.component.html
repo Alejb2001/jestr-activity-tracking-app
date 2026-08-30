@@ -1,0 +1,299 @@
+<app-navbar></app-navbar>
+
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+    <h4 class="mb-0 me-auto fw-bold">Dashboard</h4>
+
+    <!-- Quick selectors -->
+    <div class="btn-group btn-group-sm">
+      <button type="button" class="btn"
+              [class.btn-primary]="activeRange === 'today'"
+              [class.btn-outline-secondary]="activeRange !== 'today'"
+              (click)="setRange('today')">Hoy</button>
+      <button type="button" class="btn"
+              [class.btn-primary]="activeRange === 'week'"
+              [class.btn-outline-secondary]="activeRange !== 'week'"
+              (click)="setRange('week')">Esta semana</button>
+      <button type="button" class="btn"
+              [class.btn-primary]="activeRange === 'month'"
+              [class.btn-outline-secondary]="activeRange !== 'month'"
+              (click)="setRange('month')">Este mes</button>
+      <button type="button" class="btn"
+              [class.btn-primary]="activeRange === 'year'"
+              [class.btn-outline-secondary]="activeRange !== 'year'"
+              (click)="setRange('year')">Este a&ntilde;o</button>
+    </div>
+
+    <!-- Custom range -->
+    <div class="d-flex align-items-center gap-1 flex-wrap">
+      <input type="date" class="form-control form-control-sm" style="width:140px"
+             [(ngModel)]="customFrom">
+      <span class="text-muted">–</span>
+      <input type="date" class="form-control form-control-sm" style="width:140px"
+             [(ngModel)]="customTo">
+      <button type="button" class="btn btn-sm btn-outline-primary"
+              (click)="applyCustomRange()">Aplicar</button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (error) {
+    <div class="alert alert-danger d-flex align-items-center justify-content-between">
+      <span>{{ error }}</span>
+      <button type="button" class="btn btn-sm btn-outline-danger" (click)="load()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Skeleton loading -->
+  @if (loading) {
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="col">
+          <div class="card p-3 text-center">
+            <div class="placeholder-glow">
+              <span class="placeholder col-6 mb-2" style="height:2rem;display:block;margin:0 auto"></span>
+              <span class="placeholder col-8"></span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!loading && stats) {
+
+    <!-- KPI Cards -->
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+      <div class="col">
+        <div class="card h-100 text-center p-3 border-0 shadow-sm">
+          <div class="fs-1 fw-bold text-dark">{{ stats.summary.total }}</div>
+          <div class="text-muted small fw-medium">Total</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center p-3 border-0 shadow-sm">
+          <div class="fs-1 fw-bold text-success">{{ stats.summary.completed }}</div>
+          <div class="text-muted small fw-medium">Completadas</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center p-3 border-0 shadow-sm">
+          <div class="fs-1 fw-bold text-primary">{{ stats.summary.inProgress }}</div>
+          <div class="text-muted small fw-medium">En Progreso</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 text-center p-3 border-0 shadow-sm">
+          <div class="fs-1 fw-bold text-warning">{{ stats.summary.pending }}</div>
+          <div class="text-muted small fw-medium">Pendientes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority + Quality row -->
+    <div class="row g-3 mb-4">
+
+      <!-- Distribución por prioridad -->
+      <div class="col-md-5">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <h6 class="fw-semibold mb-3">Distribución por prioridad</h6>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-medium text-danger">Alta</span>
+              <span class="small text-muted">{{ stats.byPriority.high }} ({{ barPct(stats.byPriority.high, stats.summary.total) }}%)</span>
+            </div>
+            <div class="rounded-pill bg-light overflow-hidden" style="height:10px">
+              <div class="h-100 rounded-pill bg-danger"
+                   [style.width.%]="barPct(stats.byPriority.high, stats.summary.total)">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-medium text-warning">Media</span>
+              <span class="small text-muted">{{ stats.byPriority.medium }} ({{ barPct(stats.byPriority.medium, stats.summary.total) }}%)</span>
+            </div>
+            <div class="rounded-pill bg-light overflow-hidden" style="height:10px">
+              <div class="h-100 rounded-pill bg-warning"
+                   [style.width.%]="barPct(stats.byPriority.medium, stats.summary.total)">
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-0">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-medium text-info">Baja</span>
+              <span class="small text-muted">{{ stats.byPriority.low }} ({{ barPct(stats.byPriority.low, stats.summary.total) }}%)</span>
+            </div>
+            <div class="rounded-pill bg-light overflow-hidden" style="height:10px">
+              <div class="h-100 rounded-pill bg-info"
+                   [style.width.%]="barPct(stats.byPriority.low, stats.summary.total)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas de calidad -->
+      <div class="col-md-7">
+        <div class="card h-100 border-0 shadow-sm p-4">
+          <h6 class="fw-semibold mb-3">M&eacute;tricas de calidad</h6>
+          <div class="row g-3">
+            <div class="col-sm-4">
+              <div class="rounded-3 p-3 text-center" style="background:#f0fdf4">
+                <div class="fs-3 fw-bold text-success">{{ stats.summary.completionRate }}%</div>
+                <div class="small text-muted mt-1">Tasa de completaci&oacute;n</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="rounded-3 p-3 text-center" style="background:#fff7ed">
+                <div class="fs-3 fw-bold text-warning">{{ stats.summary.onTimeRate }}%</div>
+                <div class="small text-muted mt-1">A tiempo</div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="rounded-3 p-3 text-center" style="background:#fef2f2">
+                <div class="fs-3 fw-bold text-danger">{{ stats.summary.overdue }}</div>
+                <div class="small text-muted mt-1">Vencidas</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado cancelado -->
+          <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top">
+            <span class="badge bg-secondary">{{ stats.summary.cancelled }}</span>
+            <span class="small text-muted">actividades canceladas en el per&iacute;odo</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tabla de usuarios (solo admin / company_admin) -->
+    @if (isManager && stats.byUser.length > 0) {
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+          <h6 class="mb-0 fw-semibold">Rendimiento por usuario</h6>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Usuario</th>
+                <th class="text-center">Total</th>
+                <th class="text-center">Completadas</th>
+                <th class="text-center">En Progreso</th>
+                <th class="text-center">Pendientes</th>
+                <th class="text-center">% Completaci&oacute;n</th>
+                <th class="text-center">Vencidas</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of stats.byUser; track user.userId) {
+                <!-- Fila del usuario -->
+                <tr class="cursor-pointer" style="cursor:pointer"
+                    (click)="toggleUser(user)">
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                            style="width:32px;height:32px;font-size:13px;flex-shrink:0">
+                        {{ initial(user.userName) }}
+                      </span>
+                      <span class="fw-medium">{{ user.userName }}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                           class="text-muted ms-1"
+                           [style.transform]="expandedUser === user.userId ? 'rotate(180deg)' : 'rotate(0)'"
+                           style="transition:transform 0.2s">
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </div>
+                  </td>
+                  <td class="text-center fw-semibold">{{ user.total }}</td>
+                  <td class="text-center">
+                    <span class="badge bg-success">{{ user.completed }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-primary">{{ user.inProgress }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-warning text-dark">{{ user.pending }}</span>
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                      <div class="rounded-pill bg-light overflow-hidden" style="width:60px;height:8px">
+                        <div class="h-100 rounded-pill bg-success" [style.width.%]="user.completionRate"></div>
+                      </div>
+                      <span class="small">{{ user.completionRate }}%</span>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    @if (user.overdue > 0) {
+                      <span class="badge bg-danger">{{ user.overdue }}</span>
+                    } @else {
+                      <span class="text-muted small">—</span>
+                    }
+                  </td>
+                </tr>
+
+                <!-- Fila expandida con actividades del usuario -->
+                @if (expandedUser === user.userId) {
+                  <tr class="table-light">
+                    <td colspan="7" class="p-0">
+                      <div class="px-4 py-3">
+                        @if (userActivitiesLoading) {
+                          <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <span class="ms-2 small text-muted">Cargando actividades...</span>
+                          </div>
+                        } @else if (userActivities.length === 0) {
+                          <p class="text-muted small mb-0 text-center py-2">Sin actividades en el per&iacute;odo seleccionado.</p>
+                        } @else {
+                          <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                              <thead>
+                                <tr class="small text-muted">
+                                  <th class="fw-medium">T&iacute;tulo</th>
+                                  <th class="fw-medium">Estado</th>
+                                  <th class="fw-medium">Inicio</th>
+                                  <th class="fw-medium">Fin</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @for (act of userActivities; track act.id) {
+                                  <tr>
+                                    <td class="small">{{ act.title }}</td>
+                                    <td>
+                                      <span class="badge small" [class]="statusBadgeClass(act.statusLabel)">
+                                        {{ act.statusLabel }}
+                                      </span>
+                                    </td>
+                                    <td class="small text-muted">{{ act.scheduledStart | date:'dd/MM/yyyy' }}</td>
+                                    <td class="small text-muted">{{ act.scheduledEnd | date:'dd/MM/yyyy' }}</td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    @if (isManager && stats.byUser.length === 0 && stats.summary.total > 0) {
+      <div class="alert alert-info small">No hay datos por usuario disponibles para el rango seleccionado.</div>
+    }
+
+  }
+
+</div>

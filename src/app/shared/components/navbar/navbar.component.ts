@@ -112,6 +112,18 @@ import { AuthService } from '../../../core/services/auth.service';
       <!-- Links de navegación -->
       <nav class="flex-grow-1 py-2 overflow-auto">
 
+        <a routerLink="/dashboard"
+           routerLinkActive="active"
+           class="sidebar-link d-flex align-items-center gap-3 px-4 py-3"
+           (click)="closeSidebar()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="12" width="4" height="9" rx="1"/>
+            <rect x="10" y="7" width="4" height="14" rx="1"/>
+            <rect x="17" y="3" width="4" height="18" rx="1"/>
+          </svg>
+          Dashboard
+        </a>
+
         <a routerLink="/activities"
            routerLinkActive="active"
            [routerLinkActiveOptions]="{ exact: true }"
