@@ -1,0 +1,109 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light py-5">
+  <div class="card shadow-sm w-100" style="max-width:520px">
+    <div class="card-body p-4 p-md-5">
+
+      <!-- Logo + título -->
+      <div class="text-center mb-4">
+        <img src="favicon.ico" alt="Jestr" style="width:56px;height:56px;object-fit:contain;margin-bottom:12px">
+        <h4 class="fw-bold mb-1">Solicitar acceso</h4>
+        <p class="text-muted" style="font-size:14px">Completa el formulario y revisaremos tu solicitud</p>
+      </div>
+
+      <!-- Éxito -->
+      @if (submitted) {
+        <div class="text-center py-3">
+          <div class="mb-3" style="font-size:3rem">&#10003;</div>
+          <h5 class="fw-bold mb-2">¡Solicitud enviada!</h5>
+          <p class="text-muted mb-4">Hemos recibido tu solicitud. El equipo de Jestr la revisará y te contactará por email a la brevedad.</p>
+          <a routerLink="/login" class="btn btn-primary px-4">Volver al inicio de sesi&oacute;n</a>
+        </div>
+      }
+
+      <!-- Formulario -->
+      @if (!submitted) {
+        @if (error) {
+          <div class="alert alert-danger py-2 mb-3" style="font-size:14px">{{ error }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+          <div class="row g-3">
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Nombre de la empresa <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="companyName"
+                     placeholder="Ej. Acme Corp"
+                     [class.is-invalid]="hasError('companyName','required') || hasError('companyName','maxlength')">
+              <div class="invalid-feedback">Requerido (máx. 100 caracteres).</div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Código de empresa <span class="text-danger">*</span></label>
+              <input type="text" class="form-control text-uppercase" formControlName="companyCode"
+                     placeholder="Ej. ACME"
+                     [class.is-invalid]="hasError('companyCode','required') || hasError('companyCode','pattern') || hasError('companyCode','maxlength')">
+              <div class="form-text">Solo letras, números, guiones y guiones bajos. Se usará para iniciar sesión.</div>
+              <div class="invalid-feedback">Solo letras y números, máx. 20 caracteres.</div>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Nombre del contacto <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="contactName"
+                     placeholder="Tu nombre completo"
+                     [class.is-invalid]="hasError('contactName','required')">
+              <div class="invalid-feedback">Requerido.</div>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Email de contacto <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" formControlName="contactEmail"
+                     placeholder="tu@empresa.com"
+                     [class.is-invalid]="hasError('contactEmail','required') || hasError('contactEmail','email')">
+              <div class="invalid-feedback">Email válido requerido.</div>
+            </div>
+
+            <div class="col-12"><hr class="my-1"></div>
+
+            <div class="col-12">
+              <p class="text-muted mb-2" style="font-size:13px">Credenciales para el administrador de la empresa:</p>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Usuario admin <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="adminUsername"
+                     placeholder="Ej. admin.acme"
+                     autocomplete="username"
+                     [class.is-invalid]="hasError('adminUsername','required') || hasError('adminUsername','minlength')">
+              <div class="invalid-feedback">Mín. 3 caracteres.</div>
+            </div>
+
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold">Contrase&ntilde;a <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" formControlName="adminPassword"
+                     placeholder="Mín. 8 caracteres"
+                     autocomplete="new-password"
+                     [class.is-invalid]="hasError('adminPassword','required') || hasError('adminPassword','minlength')">
+              <div class="invalid-feedback">Mín. 8 caracteres.</div>
+            </div>
+
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-4" [disabled]="submitting">
+            @if (submitting) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Enviando...
+            } @else {
+              Enviar solicitud
+            }
+          </button>
+
+        </form>
+
+        <p class="text-center mt-3 mb-0" style="font-size:13px">
+          ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesi&oacute;n</a>
+        </p>
+      }
+
+    </div>
+  </div>
+</div>

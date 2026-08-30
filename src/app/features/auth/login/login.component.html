@@ -60,6 +60,10 @@
           <div class="invalid-feedback">La contrase&ntilde;a es requerida.</div>
         </div>
 
+        <p class="text-center mb-3" style="font-size:13px">
+          ¿Empresa nueva? <a routerLink="/register">Solicita acceso</a>
+        </p>
+
         <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
           @if (loading) {
             <span class="spinner-border spinner-border-sm me-2" role="status"></span>

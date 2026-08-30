@@ -6,6 +6,21 @@ import { companyAccessGuard } from './core/guards/company-access.guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'activities', pathMatch: 'full' },
   {
+    path: 'register',
+    title: 'Solicitar acceso',
+    loadComponent: () =>
+      import('./features/register/register.component')
+        .then(m => m.RegisterComponent)
+  },
+  {
+    path: 'registrations',
+    title: 'Solicitudes de registro',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/registrations/registrations.component')
+        .then(m => m.RegistrationsComponent)
+  },
+  {
     path: 'login',
     title: 'Iniciar sesi\u00f3n',
     loadComponent: () =>
