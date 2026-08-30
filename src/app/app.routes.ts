@@ -76,5 +76,25 @@ export const routes: Routes = [
       import('./features/companies/company-detail/company-detail.component')
         .then(m => m.CompanyDetailComponent)
   },
-  { path: '**', redirectTo: 'activities' }
+  {
+    path: 'terms',
+    title: 'Términos de Uso',
+    loadComponent: () =>
+      import('./features/legal/terms.component')
+        .then(m => m.TermsComponent)
+  },
+  {
+    path: 'privacy',
+    title: 'Política de Privacidad',
+    loadComponent: () =>
+      import('./features/legal/privacy.component')
+        .then(m => m.PrivacyComponent)
+  },
+  {
+    path: '**',
+    title: 'Página no encontrada',
+    loadComponent: () =>
+      import('./features/not-found/not-found.component')
+        .then(m => m.NotFoundComponent)
+  }
 ];
