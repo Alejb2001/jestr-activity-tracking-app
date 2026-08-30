@@ -20,7 +20,6 @@ export class RegisterComponent {
 
   form = this.fb.group({
     companyName:   ['', [Validators.required, Validators.maxLength(100)]],
-    companyCode:   ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Z0-9_-]+$/i)]],
     contactName:   ['', [Validators.required, Validators.maxLength(100)]],
     contactEmail:  ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
     adminUsername: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
@@ -39,7 +38,6 @@ export class RegisterComponent {
     const v = this.form.value;
     this.svc.submit({
       companyName:   v.companyName!,
-      companyCode:   v.companyCode!.toUpperCase(),
       contactName:   v.contactName!,
       contactEmail:  v.contactEmail!,
       adminUsername: v.adminUsername!,

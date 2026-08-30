@@ -21,7 +21,6 @@ export interface Registration {
 
 export interface CreateRegistrationPayload {
   companyName: string;
-  companyCode: string;
   contactName: string;
   contactEmail: string;
   adminUsername: string;

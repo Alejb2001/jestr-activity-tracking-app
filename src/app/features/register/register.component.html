@@ -32,21 +32,12 @@
             <div class="col-12">
               <label class="form-label fw-semibold">Nombre de la empresa <span class="text-danger">*</span></label>
               <input type="text" class="form-control" formControlName="companyName"
-                     placeholder="Ej. Acme Corp"
+                     placeholder="Nombre de tu empresa"
                      [class.is-invalid]="hasError('companyName','required') || hasError('companyName','maxlength')">
               <div class="invalid-feedback">Requerido (máx. 100 caracteres).</div>
             </div>
 
-            <div class="col-12">
-              <label class="form-label fw-semibold">Código de empresa <span class="text-danger">*</span></label>
-              <input type="text" class="form-control text-uppercase" formControlName="companyCode"
-                     placeholder="Ej. ACME"
-                     [class.is-invalid]="hasError('companyCode','required') || hasError('companyCode','pattern') || hasError('companyCode','maxlength')">
-              <div class="form-text">Solo letras, números, guiones y guiones bajos. Se usará para iniciar sesión.</div>
-              <div class="invalid-feedback">Solo letras y números, máx. 20 caracteres.</div>
-            </div>
-
-            <div class="col-sm-6">
+<div class="col-sm-6">
               <label class="form-label fw-semibold">Nombre del contacto <span class="text-danger">*</span></label>
               <input type="text" class="form-control" formControlName="contactName"
                      placeholder="Tu nombre completo"
@@ -71,7 +62,7 @@
             <div class="col-sm-6">
               <label class="form-label fw-semibold">Usuario admin <span class="text-danger">*</span></label>
               <input type="text" class="form-control" formControlName="adminUsername"
-                     placeholder="Ej. admin.acme"
+                     placeholder="Nombre de usuario"
                      autocomplete="username"
                      [class.is-invalid]="hasError('adminUsername','required') || hasError('adminUsername','minlength')">
               <div class="invalid-feedback">Mín. 3 caracteres.</div>
