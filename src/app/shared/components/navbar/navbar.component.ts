@@ -40,22 +40,22 @@ import { AuthService } from '../../../core/services/auth.service';
   `],
   template: `
     <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-primary mb-4">
+    <nav class="navbar navbar-dark bg-primary mb-4" style="padding-top:14px;padding-bottom:14px">
       <div class="container">
 
         <!-- Brand: empresa + usuario logueado -->
         <a class="navbar-brand lh-1 py-1" routerLink="/activities">
-          <span class="fw-bold d-block" style="font-size:1rem;line-height:1.2">{{ brandName }}</span>
-          <span class="d-block" style="font-size:11px;font-weight:400;opacity:0.85;line-height:1.3">{{ currentUser?.username }}</span>
+          <span class="fw-bold d-block" style="font-size:1.25rem;line-height:1.2">{{ brandName }}</span>
+          <span class="d-block" style="font-size:13px;font-weight:400;opacity:0.85;line-height:1.4">{{ currentUser?.username }}</span>
         </a>
 
-        <!-- Botón hamburger -->
-        <button class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center"
-                style="width:36px;height:36px;padding:0"
+        <!-- Botón hamburger (extremo derecho) -->
+        <button class="btn btn-outline-light d-flex align-items-center justify-content-center ms-auto"
+                style="width:46px;height:46px;padding:0"
                 (click)="openSidebar($event)"
                 type="button"
                 aria-label="Abrir menú">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <line x1="3" y1="6"  x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>
             <line x1="3" y1="18" x2="21" y2="18"/>
