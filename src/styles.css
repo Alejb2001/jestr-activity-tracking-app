@@ -1,1 +1,297 @@
-/* You can add global styles to this file, and also import other style files */
+/* ══════════════════════════════════════════════════════════════════════════════
+   NEO-BRUTALISM — JESTR ACTIVITY TRACKER
+   Principios: bordes negros gruesos · sombras duras sin blur · tipografía bold
+               · fondo crema · colores vibrantes
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Variables ────────────────────────────────────────────────────────────── */
+:root {
+  --nb-border:    2.5px solid #000;
+  --nb-shadow:    4px 4px 0 #000;
+  --nb-shadow-lg: 6px 6px 0 #000;
+  --nb-shadow-sm: 2px 2px 0 #000;
+  --nb-radius:    0px;
+  --nb-accent:    #ffdd00;
+  --nb-bg:        #f5f0e8;
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--nb-bg);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Headings ─────────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6, .fw-bold, .fw-semibold {
+  font-weight: 800 !important;
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+.card {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow) !important;
+  background: #fff !important;
+}
+.card-header {
+  border-bottom: var(--nb-border) !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.card-footer {
+  border-top: var(--nb-border) !important;
+  border-radius: 0 !important;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+.btn:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--nb-shadow) !important;
+}
+.btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+.btn:disabled {
+  box-shadow: none !important;
+  opacity: 0.55;
+}
+
+/* Variantes outline — forzar borde negro */
+.btn-outline-secondary,
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-warning {
+  border-color: #000 !important;
+}
+
+/* Accent: usar amarillo neo-brutal para el btn-warning */
+.btn-warning {
+  background-color: var(--nb-accent) !important;
+  color: #000 !important;
+  border-color: #000 !important;
+}
+
+/* ── Inputs / Selects ─────────────────────────────────────────────────────── */
+.form-control,
+.form-select {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  background: #fff !important;
+  font-weight: 500;
+  box-shadow: none !important;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: #000 !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  outline: none !important;
+}
+.form-control::placeholder {
+  font-weight: 400;
+  color: #888;
+}
+.input-group-text {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  font-weight: 700;
+  background: var(--nb-accent) !important;
+  color: #000 !important;
+}
+
+/* ── Tables ───────────────────────────────────────────────────────────────── */
+.table {
+  border: var(--nb-border);
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  border-color: #000 !important;
+  border-width: 1.5px !important;
+}
+.table thead th {
+  border-bottom: var(--nb-border) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  font-size: 11.5px;
+  letter-spacing: 0.7px;
+  background: var(--nb-accent) !important;
+  color: #000 !important;
+}
+.table-light > * > * {
+  background-color: #f5f0e8 !important;
+}
+.table-hover > tbody > tr:hover > * {
+  background-color: #fff9d6 !important;
+}
+.table-responsive {
+  border: var(--nb-border);
+  box-shadow: var(--nb-shadow);
+}
+/* Evitar doble borde cuando card contiene table-responsive */
+.card .table-responsive {
+  border: none;
+  box-shadow: none;
+}
+
+/* ── Badges ───────────────────────────────────────────────────────────────── */
+.badge {
+  border: 1.5px solid #000 !important;
+  border-radius: var(--nb-radius) !important;
+  font-weight: 800 !important;
+  box-shadow: var(--nb-shadow-sm);
+  letter-spacing: 0.3px;
+}
+.bg-warning.badge,
+.badge.bg-warning {
+  color: #000 !important;
+}
+
+/* ── Alerts ───────────────────────────────────────────────────────────────── */
+.alert {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  font-weight: 600;
+}
+.alert-info {
+  background-color: #e0f0ff !important;
+}
+.alert-danger {
+  background-color: #ffe0e0 !important;
+}
+.alert-success {
+  background-color: #e0ffe8 !important;
+}
+.alert-warning {
+  background-color: #fff9d6 !important;
+}
+
+/* ── Navbar ───────────────────────────────────────────────────────────────── */
+.navbar {
+  border-bottom: 3.5px solid #000 !important;
+  box-shadow: 0 4px 0 #000 !important;
+}
+.navbar .navbar-brand {
+  font-weight: 900 !important;
+}
+
+/* ── Paginación ───────────────────────────────────────────────────────────── */
+.pagination {
+  gap: 4px;
+}
+.page-item .page-link {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  font-weight: 700;
+  color: #000;
+  background: #fff;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.page-item .page-link:hover {
+  background: var(--nb-accent) !important;
+  transform: translate(-1px, -1px);
+  box-shadow: var(--nb-shadow-sm) !important;
+}
+.page-item.active .page-link {
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+}
+.page-item.disabled .page-link {
+  opacity: 0.45;
+  box-shadow: none !important;
+}
+
+/* ── Dropdowns ────────────────────────────────────────────────────────────── */
+.dropdown-menu {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow) !important;
+  background: #fff;
+}
+.dropdown-item:hover {
+  background: var(--nb-accent) !important;
+  color: #000 !important;
+  font-weight: 700;
+}
+
+/* ── Modales ──────────────────────────────────────────────────────────────── */
+.modal-content {
+  border: var(--nb-border) !important;
+  border-radius: var(--nb-radius) !important;
+  box-shadow: var(--nb-shadow-lg) !important;
+  background: #fff;
+}
+.modal-header {
+  border-bottom: var(--nb-border) !important;
+  background: var(--nb-accent) !important;
+  color: #000 !important;
+}
+.modal-header .btn-close {
+  filter: none !important;
+  border: var(--nb-border) !important;
+  box-shadow: var(--nb-shadow-sm) !important;
+  border-radius: var(--nb-radius) !important;
+  width: 28px;
+  height: 28px;
+}
+.modal-footer {
+  border-top: var(--nb-border) !important;
+}
+
+/* ── Tabs (nav-tabs en company-detail) ────────────────────────────────────── */
+.nav-tabs {
+  border-bottom: var(--nb-border) !important;
+  gap: 4px;
+}
+.nav-tabs .nav-link {
+  border: var(--nb-border) !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  font-weight: 700;
+  color: #000;
+  background: #fff;
+}
+.nav-tabs .nav-link.active {
+  background: var(--nb-accent) !important;
+  color: #000 !important;
+  font-weight: 800;
+}
+.nav-tabs .nav-link:hover:not(.active) {
+  background: #f5f0e8 !important;
+}
+
+/* ── Spinners ─────────────────────────────────────────────────────────────── */
+.spinner-border {
+  border-width: 3px;
+}
+
+/* ── Checkboxes ───────────────────────────────────────────────────────────── */
+.form-check-input {
+  border: var(--nb-border) !important;
+  border-radius: 0 !important;
+}
+.form-check-input:checked {
+  background-color: #000 !important;
+  border-color: #000 !important;
+}
+.form-check-input:focus {
+  box-shadow: var(--nb-shadow-sm) !important;
+}
+
+/* ── Misc utilitarios ─────────────────────────────────────────────────────── */
+.border-top    { border-top:    var(--nb-border) !important; }
+.border-bottom { border-bottom: var(--nb-border) !important; }

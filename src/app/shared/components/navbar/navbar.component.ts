@@ -9,33 +9,37 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [CommonModule, RouterModule],
   styles: [`
     .sidebar-link {
-      transition: background 0.15s;
+      transition: background 0.1s, transform 0.1s;
       border-left: 3px solid transparent;
-      color: #212529;
+      color: #000;
       text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
     .sidebar-link:hover {
-      background: #f1f5f9;
-      color: #212529;
+      background: #ffdd00;
+      color: #000;
+      border-left-color: #000;
     }
     .sidebar-link.active {
-      background: #eff6ff;
-      color: #1d4ed8 !important;
-      border-left-color: #1d4ed8;
-      font-weight: 600;
+      background: #ffdd00;
+      color: #000 !important;
+      border-left: 4px solid #000;
+      font-weight: 800;
     }
     .sidebar-panel {
       position: fixed;
       top: 0;
       right: 0;
       height: 100%;
-      width: 280px;
+      width: 290px;
       background: #fff;
       z-index: 1050;
-      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      border-left: 3px solid #000;
+      box-shadow: -6px 0 0 #000;
       display: flex;
       flex-direction: column;
-      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1);
     }
   `],
   template: `
